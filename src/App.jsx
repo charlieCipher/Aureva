@@ -21,6 +21,7 @@ function App() {
   const [search, setSearch] = useState("");
   const [filterType, setFilterType] = useState("All");
   const [showPricing, setShowPricing] = useState(false);
+  const [userTier, setUserTier] = useState("free");
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -32,7 +33,10 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (session) fetchAssets();
+    if (session) {
+      fetchAssets();
+      fetchTier();
+    }
   }, [session]);
 
   async function fetchAssets() {
@@ -43,6 +47,15 @@ function App() {
       .order("created_at", { ascending: false });
     if (!error) setAssets(data || []);
     setLoadingAssets(false);
+  }
+
+  async function fetchTier() {
+    const { data } = await supabase
+      .from("profiles")
+      .select("tier")
+      .eq("id", session?.user?.id)
+      .single();
+    if (data) setUserTier(data.tier || "free");
   }
 
   async function handleLogout() {
@@ -169,10 +182,11 @@ function App() {
     boxSizing: "border-box",
   };
 
-  // Show family view if URL is /family
   if (window.location.pathname === "/family") return <FamilyView />;
-
-  if (showPricing) return <Pricing onClose={() => setShowPricing(false)} />;
+  if (showPricing)
+    return (
+      <Pricing onClose={() => setShowPricing(false)} userTier={userTier} />
+    );
   if (!session) return <Auth />;
 
   if (selectedAsset) {
@@ -876,7 +890,57 @@ function App() {
               )}
             </div>
 
-            <LegalExport assets={assets} userEmail={session.user.email} />
+            {/* Legal Export — locked for free users */}
+            {userTier !== "free" ? (
+              <LegalExport assets={assets} userEmail={session.user.email} />
+            ) : (
+              <div
+                style={{
+                  background: "#1e293b",
+                  borderRadius: 12,
+                  padding: 24,
+                  marginBottom: 24,
+                  textAlign: "center",
+                }}
+              >
+                <p
+                  style={{
+                    margin: "0 0 8px 0",
+                    color: "white",
+                    fontSize: 16,
+                    fontWeight: "bold",
+                  }}
+                >
+                  ⚖️ Legal Export PDF
+                </p>
+                <p
+                  style={{
+                    margin: "0 0 16px 0",
+                    color: "#64748b",
+                    fontSize: 13,
+                  }}
+                >
+                  Generate a lawyer-ready PDF of all your assets and
+                  instructions.
+                </p>
+                <button
+                  onClick={() => setShowPricing(true)}
+                  style={{
+                    padding: "10px 24px",
+                    background: "#6366f1",
+                    color: "white",
+                    border: "none",
+                    cursor: "pointer",
+                    borderRadius: 8,
+                    fontSize: 14,
+                    fontWeight: "bold",
+                  }}
+                >
+                  Unlock Legal Export — ₹1,299
+                </button>
+              </div>
+            )}
+
             <TrustBadges />
           </>
         )}
@@ -1075,7 +1139,55 @@ function App() {
         {activeTab === "vault" && <Upload session={session} />}
 
         {/* Family Tab */}
-        {activeTab === "family" && <FamilySettings session={session} />}
+        {activeTab === "family" &&
+          (userTier === "free" ? (
+            <div
+              style={{
+                background: "#1e293b",
+                borderRadius: 12,
+                padding: 32,
+                textAlign: "center",
+              }}
+            >
+              <p style={{ fontSize: 48, margin: "0 0 16px 0" }}>🔒</p>
+              <h2 style={{ margin: "0 0 8px 0", color: "white", fontSize: 20 }}>
+                Family Access — Standard Plan
+              </h2>
+              <p
+                style={{ margin: "0 0 24px 0", color: "#64748b", fontSize: 14 }}
+              >
+                Upgrade to Standard to share your vault with family.
+              </p>
+              <p
+                style={{
+                  margin: "0 0 8px 0",
+                  color: "white",
+                  fontSize: 16,
+                  fontWeight: "bold",
+                }}
+              >
+                "Your family won't know what you own."
+              </p>
+              <button
+                onClick={() => setShowPricing(true)}
+                style={{
+                  marginTop: 16,
+                  padding: "12px 32px",
+                  background: "#6366f1",
+                  color: "white",
+                  border: "none",
+                  cursor: "pointer",
+                  borderRadius: 8,
+                  fontSize: 15,
+                  fontWeight: "bold",
+                }}
+              >
+                Unlock Family View — ₹1,299
+              </button>
+            </div>
+          ) : (
+            <FamilySettings session={session} />
+          ))}
       </div>
     </div>
   );
