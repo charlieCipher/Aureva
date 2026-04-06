@@ -53,7 +53,6 @@ function Auth() {
             textAlign: "center",
           }}
         >
-          {/* Animated lock icon */}
           <div
             style={{
               width: 80,
@@ -67,7 +66,7 @@ function Auth() {
               border: "2px solid #6366f1",
             }}
           >
-            <span style={{ fontSize: 36 }}>🔐</span>
+            <span style={{ fontSize: 36 }}>&#128272;</span>
           </div>
 
           <h2 style={{ margin: "0 0 8px 0", color: "white", fontSize: 22 }}>
@@ -125,10 +124,10 @@ function Auth() {
               WHAT HAPPENS NEXT
             </p>
             {[
-              { icon: "📧", text: "Open the email from Continuum" },
-              { icon: "🔗", text: "Click the verification link" },
-              { icon: "🔐", text: "Your recovery phrase will be shown" },
-              { icon: "✅", text: "Your secure vault is ready" },
+              { icon: "&#128231;", text: "Open the email from Aureva" },
+              { icon: "&#128279;", text: "Click the verification link" },
+              { icon: "&#128272;", text: "Your recovery phrase will be shown" },
+              { icon: "&#9989;", text: "Your secure vault is ready" },
             ].map((step, i) => (
               <div
                 key={i}
@@ -139,7 +138,10 @@ function Auth() {
                   marginBottom: 10,
                 }}
               >
-                <span style={{ fontSize: 20 }}>{step.icon}</span>
+                <span
+                  style={{ fontSize: 20 }}
+                  dangerouslySetInnerHTML={{ __html: step.icon }}
+                />
                 <p style={{ margin: 0, color: "#94a3b8", fontSize: 13 }}>
                   {step.text}
                 </p>
@@ -157,7 +159,7 @@ function Auth() {
             }}
           >
             <p style={{ margin: 0, color: "#f59e0b", fontSize: 12 }}>
-              ⚠️ Check your spam folder if you don't see the email in 2 minutes
+              Check your spam folder if you don't see the email in 2 minutes
             </p>
           </div>
 
@@ -167,7 +169,7 @@ function Auth() {
                 type: "signup",
                 email,
               });
-              if (!error) setMessage("✅ Verification email resent!");
+              if (!error) setMessage("Verification email resent!");
               else setMessage("Failed to resend. Try again.");
             }}
             style={{
@@ -182,7 +184,7 @@ function Auth() {
               marginBottom: 12,
             }}
           >
-            🔄 Resend Verification Email
+            Resend Verification Email
           </button>
 
           <p
@@ -201,13 +203,7 @@ function Auth() {
           </p>
 
           {message && (
-            <p
-              style={{
-                color: message.includes("✅") ? "#10b981" : "#ef4444",
-                fontSize: 13,
-                marginTop: 12,
-              }}
-            >
+            <p style={{ color: "#10b981", fontSize: 13, marginTop: 12 }}>
               {message}
             </p>
           )}
@@ -238,7 +234,7 @@ function Auth() {
         }}
       >
         <h1 style={{ margin: "0 0 4px 0", color: "#6366f1", fontSize: 28 }}>
-          🔐 Continuum
+          Continuum
         </h1>
         <p style={{ margin: "0 0 32px 0", color: "#64748b", fontSize: 14 }}>
           Your secure legacy vault
