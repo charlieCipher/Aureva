@@ -1,6 +1,7 @@
 /* eslint-disable */
 import { useState } from "react";
 import { jsPDF } from "jspdf";
+import MahaWillNotice from "./MahaWillNotice";
 
 function LegalExport({ assets, userEmail }) {
   const [generating, setGenerating] = useState(false);
@@ -237,90 +238,96 @@ function LegalExport({ assets, userEmail }) {
   }
 
   return (
-    <div
-      style={{
-        background: "#1e293b",
-        borderRadius: 12,
-        padding: 24,
-        marginBottom: 24,
-      }}
-    >
-      <h2 style={{ margin: "0 0 8px 0", color: "white", fontSize: 18 }}>
-        📜 Legal Export
-      </h2>
-      <p style={{ margin: "0 0 16px 0", color: "#64748b", fontSize: 13 }}>
-        Generate a professional PDF summary of all your assets and family
-        instructions.
-      </p>
-
+    <>
+      <MahaWillNotice />
       <div
         style={{
-          padding: 16,
-          background: "#0f172a",
-          borderRadius: 8,
-          marginBottom: 16,
+          background: "#1e293b",
+          borderRadius: 12,
+          padding: 24,
+          marginBottom: 24,
         }}
       >
+        <h2 style={{ margin: "0 0 8px 0", color: "white", fontSize: 18 }}>
+          📜 Legal Export
+        </h2>
+        <p style={{ margin: "0 0 16px 0", color: "#64748b", fontSize: 13 }}>
+          Generate a professional PDF summary of all your assets and family
+          instructions.
+        </p>
+
+        <div
+          style={{
+            padding: 16,
+            background: "#0f172a",
+            borderRadius: 8,
+            marginBottom: 16,
+          }}
+        >
+          <p
+            style={{
+              margin: "0 0 6px 0",
+              color: "#f59e0b",
+              fontSize: 13,
+              fontWeight: "bold",
+            }}
+          >
+            📋 PDF will include:
+          </p>
+          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+            {[
+              "All your assets",
+              "Family instructions per asset",
+              "Legal disclaimer",
+              "DPDP nominee note",
+            ].map((item) => (
+              <p
+                key={item}
+                style={{ margin: 0, color: "#94a3b8", fontSize: 13 }}
+              >
+                ✓ {item}
+              </p>
+            ))}
+          </div>
+        </div>
+
+        {assets.length === 0 ? (
+          <p style={{ color: "#ef4444", fontSize: 13 }}>
+            Add at least one asset before generating a PDF.
+          </p>
+        ) : (
+          <button
+            onClick={generatePDF}
+            disabled={generating}
+            style={{
+              width: "100%",
+              padding: "14px",
+              background: generating ? "#334155" : "#6366f1",
+              color: "white",
+              border: "none",
+              cursor: generating ? "not-allowed" : "pointer",
+              borderRadius: 8,
+              fontSize: 15,
+              fontWeight: "bold",
+            }}
+          >
+            {generating ? "Generating PDF..." : "⬇️ Download Legal Export PDF"}
+          </button>
+        )}
+
         <p
           style={{
-            margin: "0 0 6px 0",
-            color: "#f59e0b",
-            fontSize: 13,
-            fontWeight: "bold",
+            margin: "12px 0 0 0",
+            color: "#475569",
+            fontSize: 11,
+            textAlign: "center",
           }}
         >
-          📋 PDF will include:
+          ⚠️ This does not replace a registered legal will. Use alongside proper
+          legal documentation.
         </p>
-        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-          {[
-            "All your assets",
-            "Family instructions per asset",
-            "Legal disclaimer",
-            "DPDP nominee note",
-          ].map((item) => (
-            <p key={item} style={{ margin: 0, color: "#94a3b8", fontSize: 13 }}>
-              ✓ {item}
-            </p>
-          ))}
-        </div>
       </div>
-
-      {assets.length === 0 ? (
-        <p style={{ color: "#ef4444", fontSize: 13 }}>
-          Add at least one asset before generating a PDF.
-        </p>
-      ) : (
-        <button
-          onClick={generatePDF}
-          disabled={generating}
-          style={{
-            width: "100%",
-            padding: "14px",
-            background: generating ? "#334155" : "#6366f1",
-            color: "white",
-            border: "none",
-            cursor: generating ? "not-allowed" : "pointer",
-            borderRadius: 8,
-            fontSize: 15,
-            fontWeight: "bold",
-          }}
-        >
-          {generating ? "Generating PDF..." : "⬇️ Download Legal Export PDF"}
-        </button>
-      )}
-
-      <p
-        style={{
-          margin: "12px 0 0 0",
-          color: "#475569",
-          fontSize: 11,
-          textAlign: "center",
-        }}
-      >
-        ⚠️ This does not replace a registered legal will. Use alongside proper
-        legal documentation.
-      </p>
-    </div>
+    </>
   );
 }
 

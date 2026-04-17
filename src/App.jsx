@@ -9,6 +9,7 @@ import TrustBadges from "./TrustBadges";
 import Pricing from "./Pricing";
 import FamilySettings from "./FamilySetting";
 import FamilyView from "./FamilyView";
+import MahaWillNotice from "./MahaWillNotice";
 
 function App() {
   const [session, setSession] = useState(null);
@@ -27,8 +28,16 @@ function App() {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
     });
+
     supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
+      if (_event === "SIGNED_IN") {
+        const shouldShow = localStorage.getItem("show_recovery_phrase");
+        if (shouldShow === "true") {
+          localStorage.removeItem("show_recovery_phrase");
+          setShowPhrase(true);
+        }
+      }
     });
   }, []);
 
@@ -593,6 +602,8 @@ function App() {
         {/* Dashboard Tab */}
         {activeTab === "dashboard" && (
           <>
+            <MahaWillNotice />
+
             <div
               style={{
                 background: "#1e293b",
