@@ -1,7 +1,7 @@
 /* eslint-disable */
-import { useState, useEffect } from "react";
-import { supabase } from "./supabase";
+import { useEffect, useState } from "react";
 import CryptoJS from "crypto-js";
+import { supabase } from "./supabase";
 
 function Upload({ session }) {
   const [file, setFile] = useState(null);
@@ -12,18 +12,17 @@ function Upload({ session }) {
   const [decryptKey, setDecryptKey] = useState("");
   const [decryptedContent, setDecryptedContent] = useState(null);
   const [decryptedFileName, setDecryptedFileName] = useState("");
-
   const userId = session?.user?.id || "public";
 
   const inputStyle = {
     display: "block",
     width: "100%",
     marginBottom: 12,
-    padding: "12px",
-    background: "#0f172a",
-    border: "1px solid #334155",
-    borderRadius: 6,
-    color: "white",
+    padding: "13px 15px",
+    background: "#fffefa",
+    border: "1px solid rgba(93,111,86,0.2)",
+    borderRadius: 16,
+    color: "#171b14",
     fontSize: 14,
     boxSizing: "border-box",
   };
@@ -38,25 +37,15 @@ function Upload({ session }) {
     try {
       const reader = new FileReader();
       reader.onload = async (e) => {
-        const fileData = e.target.result;
-        const encrypted = CryptoJS.AES.encrypt(
-          fileData,
-          encryptionKey,
-        ).toString();
+        const encrypted = CryptoJS.AES.encrypt(e.target.result, encryptionKey).toString();
         const encryptedBlob = new Blob([encrypted], { type: "text/plain" });
-
         const cleanName = file.name.replace(/[^a-zA-Z0-9.]/g, "_");
-        const timestamp = Date.now();
-        const filePath = `${userId}/${timestamp}_${cleanName}.enc`;
+        const filePath = `${userId}/${Date.now()}_${cleanName}.enc`;
+        const { error } = await supabase.storage.from("vault").upload(filePath, encryptedBlob);
 
-        const { error } = await supabase.storage
-          .from("vault")
-          .upload(filePath, encryptedBlob);
-
-        if (error) {
-          setMessage("Upload failed: " + error.message);
-        } else {
-          setMessage("File encrypted and uploaded! ✅");
+        if (error) setMessage("Upload failed: " + error.message);
+        else {
+          setMessage("File encrypted and uploaded.");
           fetchFiles();
         }
         setUploading(false);
@@ -70,50 +59,36 @@ function Upload({ session }) {
 
   async function fetchFiles() {
     const { data, error } = await supabase.storage.from("vault").list(userId);
-    if (error) {
-      console.error("FETCH ERROR:", error);
-    } else {
-      setFiles(data || []);
-    }
+    if (!error) setFiles(data || []);
   }
 
   async function handleDecrypt(fileName) {
-    if (!decryptKey)
-      return setMessage("Please enter your decryption key first.");
+    if (!decryptKey) return setMessage("Please enter your decryption key first.");
 
     setMessage("Decrypting...");
     setDecryptedContent(null);
 
-    const filePath = `${userId}/${fileName}`;
-
-    // ✅ Use signed URL instead of public URL
     const { data: signedData, error: signedError } = await supabase.storage
       .from("vault")
-      .createSignedUrl(filePath, 3600); // 1 hour expiry
+      .createSignedUrl(`${userId}/${fileName}`, 3600);
 
     if (signedError) {
       setMessage("Failed to get file access: " + signedError.message);
       return;
     }
 
-    // Download using signed URL
     const response = await fetch(signedData.signedUrl);
     const encryptedText = await response.text();
 
     try {
       const decrypted = CryptoJS.AES.decrypt(encryptedText, decryptKey);
       const decryptedData = decrypted.toString(CryptoJS.enc.Utf8);
-
-      if (!decryptedData) {
-        setMessage("❌ Wrong decryption key!");
-        return;
-      }
-
+      if (!decryptedData) return setMessage("Wrong decryption key.");
       setDecryptedContent(decryptedData);
       setDecryptedFileName(fileName.replace(".enc", ""));
-      setMessage("File decrypted successfully! ✅");
+      setMessage("File decrypted successfully.");
     } catch (err) {
-      setMessage("❌ Decryption failed: " + err.message);
+      setMessage("Decryption failed: " + err.message);
     }
   }
 
@@ -130,70 +105,61 @@ function Upload({ session }) {
   }, []);
 
   return (
-    <div style={{ fontFamily: "Arial" }}>
-      {/* Upload Section */}
-      <div
-        style={{
-          background: "#1e293b",
-          borderRadius: 12,
-          padding: 24,
-          marginBottom: 24,
-        }}
-      >
-        <h2 style={{ margin: "0 0 4px 0", color: "white", fontSize: 18 }}>
-          📤 Upload File
-        </h2>
-        <p style={{ margin: "0 0 16px 0", color: "#64748b", fontSize: 12 }}>
-          🔒 Encrypted on your device using AES-256
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 18 }}>
+      <section>
+        <p style={{ margin: "0 0 8px 0", color: "#7f9278", fontSize: 12, fontWeight: 900, letterSpacing: 1 }}>
+          SECURE UPLOAD
+        </p>
+        <h2 style={{ margin: "0 0 10px 0", color: "#171b14", fontSize: 28 }}>Upload File</h2>
+        <p style={{ margin: "0 0 18px 0", color: "#6f766a", fontSize: 14, lineHeight: 1.6 }}>
+          Encrypted locally before upload. Keep your encryption key safely.
         </p>
         <input
           type="password"
-          placeholder="Encryption key (remember this!)"
+          placeholder="Encryption key"
           value={encryptionKey}
           onChange={(e) => setEncryptionKey(e.target.value)}
           style={inputStyle}
         />
-        <input
-          type="file"
-          onChange={(e) => setFile(e.target.files[0])}
-          style={{ ...inputStyle, cursor: "pointer" }}
-        />
+        <input type="file" onChange={(e) => setFile(e.target.files[0])} style={{ ...inputStyle, cursor: "pointer" }} />
         <button
           onClick={handleUpload}
           disabled={uploading}
           style={{
             width: "100%",
-            padding: "12px",
-            background: "#6366f1",
-            color: "white",
-            border: "none",
-            cursor: "pointer",
-            borderRadius: 6,
+            padding: "14px",
+            background: "#171b14",
+            color: "#fffefa",
+            border: "1px solid #171b14",
+            cursor: uploading ? "not-allowed" : "pointer",
+            borderRadius: 999,
             fontSize: 15,
-            fontWeight: "bold",
+            fontWeight: 850,
           }}
         >
-          {uploading ? "Encrypting & Uploading..." : "🔒 Encrypt & Upload"}
+          {uploading ? "Encrypting and uploading..." : "Encrypt and Upload"}
         </button>
+      </section>
 
-        {message && (
-          <p
+      <section>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", marginBottom: 10 }}>
+          <h2 style={{ margin: 0, color: "#171b14", fontSize: 28 }}>Your Files</h2>
+          <button
+            onClick={fetchFiles}
             style={{
-              color: message.includes("✅") ? "#10b981" : "#ef4444",
-              marginTop: 12,
-              fontSize: 14,
+              padding: "8px 14px",
+              background: "#f4f2e9",
+              color: "#5f6b59",
+              border: "1px solid rgba(93,111,86,0.16)",
+              cursor: "pointer",
+              borderRadius: 999,
+              fontSize: 12,
+              fontWeight: 800,
             }}
           >
-            {message}
-          </p>
-        )}
-      </div>
-
-      {/* Files Section */}
-      <div style={{ background: "#1e293b", borderRadius: 12, padding: 24 }}>
-        <h2 style={{ margin: "0 0 16px 0", color: "white", fontSize: 18 }}>
-          📁 Your Files
-        </h2>
+            Refresh
+          </button>
+        </div>
         <input
           type="password"
           placeholder="Decryption key to unlock files"
@@ -201,94 +167,72 @@ function Upload({ session }) {
           onChange={(e) => setDecryptKey(e.target.value)}
           style={inputStyle}
         />
-
-        <button
-          onClick={fetchFiles}
-          style={{
-            marginBottom: 16,
-            padding: "8px 16px",
-            background: "#334155",
-            color: "white",
-            border: "none",
-            cursor: "pointer",
-            borderRadius: 6,
-            fontSize: 13,
-          }}
-        >
-          🔄 Refresh
-        </button>
-
-        {files.length === 0 && (
-          <p style={{ color: "#64748b", fontSize: 14 }}>
-            No files uploaded yet.
-          </p>
-        )}
-
-        {files.map((f) => (
-          <div
-            key={f.name}
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              padding: "12px 16px",
-              background: "#0f172a",
-              borderRadius: 8,
-              marginBottom: 8,
-            }}
-          >
-            <span style={{ color: "#94a3b8", fontSize: 13 }}>🔒 {f.name}</span>
-            <button
-              onClick={() => handleDecrypt(f.name)}
+        {files.length === 0 && <p style={{ color: "#6f766a", fontSize: 14 }}>No files uploaded yet.</p>}
+        <div style={{ display: "grid", gap: 10 }}>
+          {files.map((item) => (
+            <div
+              key={item.name}
               style={{
-                padding: "6px 14px",
-                background: "#10b981",
-                color: "white",
-                border: "none",
-                cursor: "pointer",
-                borderRadius: 4,
-                fontSize: 13,
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                gap: 12,
+                padding: "12px 14px",
+                background: "#f7f6f0",
+                border: "1px solid rgba(93,111,86,0.12)",
+                borderRadius: 16,
               }}
             >
-              Decrypt
-            </button>
-          </div>
-        ))}
+              <span style={{ color: "#6f766a", fontSize: 13, overflowWrap: "anywhere" }}>{item.name}</span>
+              <button
+                onClick={() => handleDecrypt(item.name)}
+                style={{
+                  padding: "8px 13px",
+                  background: "#7f9278",
+                  color: "#fffefa",
+                  border: "1px solid #7f9278",
+                  cursor: "pointer",
+                  borderRadius: 999,
+                  fontSize: 13,
+                  fontWeight: 800,
+                }}
+              >
+                Decrypt
+              </button>
+            </div>
+          ))}
+        </div>
 
         {decryptedContent && (
-          <div
-            style={{
-              marginTop: 20,
-              padding: 16,
-              background: "#0f172a",
-              borderRadius: 8,
-              border: "1px solid #10b981",
-            }}
-          >
-            <p style={{ color: "#10b981", margin: "0 0 4px 0", fontSize: 14 }}>
-              ✅ Ready: {decryptedFileName}
-            </p>
-            <p style={{ color: "#64748b", margin: "0 0 12px 0", fontSize: 11 }}>
-              🔒 Decrypted locally on your device
+          <div style={{ marginTop: 16, padding: 16, background: "#eef4ea", borderRadius: 18 }}>
+            <p style={{ color: "#5f7359", margin: "0 0 4px 0", fontSize: 14, fontWeight: 800 }}>
+              Ready: {decryptedFileName}
             </p>
             <button
               onClick={handleDownload}
               style={{
                 width: "100%",
-                padding: "10px",
-                background: "#6366f1",
-                color: "white",
-                border: "none",
+                padding: "11px",
+                background: "#171b14",
+                color: "#fffefa",
+                border: "1px solid #171b14",
                 cursor: "pointer",
-                borderRadius: 6,
+                borderRadius: 999,
                 fontSize: 14,
+                fontWeight: 800,
               }}
             >
-              ⬇️ Download Decrypted File
+              Download Decrypted File
             </button>
           </div>
         )}
-      </div>
+
+        {message && (
+          <p style={{ color: message.includes("success") || message.includes("uploaded") ? "#5f7359" : "#b8554f", marginTop: 12, fontSize: 14 }}>
+            {message}
+          </p>
+        )}
+      </section>
     </div>
   );
 }

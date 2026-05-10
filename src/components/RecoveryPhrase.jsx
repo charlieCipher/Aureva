@@ -8,59 +8,137 @@ export default function RecoveryPhrase({ onConfirmed }) {
   const [checked, setChecked] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(phrase);
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(phrase);
     setCopied(true);
   };
 
   return (
-    <div style={{ maxWidth: 500, margin: "auto", padding: 24 }}>
-      <h2>⚠️ Your Recovery Phrase</h2>
-      <p style={{ color: "red" }}>
-        Write this down. If you lose it, your data{" "}
-        <strong>cannot be recovered</strong>. We do not store this.
-      </p>
-
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "#0f172a",
+        color: "white",
+        fontFamily: "Arial",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: 20,
+        boxSizing: "border-box",
+      }}
+    >
       <div
         style={{
-          background: "#f4f4f4",
-          padding: 16,
-          borderRadius: 8,
-          fontFamily: "monospace",
-          fontSize: 15,
-          lineHeight: 2,
-          wordSpacing: 8,
+          width: "100%",
+          maxWidth: 560,
+          background: "#1e293b",
+          borderRadius: 16,
+          padding: 28,
+          boxShadow: "0 25px 50px rgba(0,0,0,0.45)",
         }}
       >
-        {phrase}
-      </div>
+        <p
+          style={{
+            margin: "0 0 8px 0",
+            color: "#818cf8",
+            fontSize: 12,
+            fontWeight: "bold",
+            letterSpacing: 1,
+          }}
+        >
+          IMPORTANT FAMILY SAFETY STEP
+        </p>
+        <h2 style={{ margin: "0 0 10px 0", fontSize: 24 }}>
+          Save Your Family Recovery Key
+        </h2>
+        <p
+          style={{
+            margin: "0 0 18px 0",
+            color: "#94a3b8",
+            fontSize: 14,
+            lineHeight: 1.6,
+          }}
+        >
+          This 24-word key protects access to your private vault. Save it in a
+          safe place before continuing. Aureva cannot show it again or reset it
+          for you.
+        </p>
 
-      <button onClick={handleCopy} style={{ marginTop: 12 }}>
-        {copied ? "✅ Copied!" : "Copy Phrase"}
-      </button>
+        <div
+          style={{
+            background: "#0f172a",
+            border: "1px solid #334155",
+            padding: 18,
+            borderRadius: 12,
+            fontFamily: "monospace",
+            fontSize: 15,
+            lineHeight: 2,
+            wordSpacing: 8,
+            color: "#e2e8f0",
+          }}
+        >
+          {phrase}
+        </div>
 
-      <div style={{ marginTop: 20 }}>
-        <label>
+        <button
+          onClick={handleCopy}
+          style={{
+            marginTop: 14,
+            width: "100%",
+            padding: "12px",
+            background: copied ? "#10b981" : "#334155",
+            color: "white",
+            border: "none",
+            cursor: "pointer",
+            borderRadius: 8,
+            fontSize: 14,
+            fontWeight: "bold",
+          }}
+        >
+          {copied ? "Copied" : "Copy Family Recovery Key"}
+        </button>
+
+        <label
+          style={{
+            marginTop: 18,
+            display: "flex",
+            gap: 10,
+            alignItems: "flex-start",
+            color: "#cbd5e1",
+            fontSize: 14,
+            lineHeight: 1.5,
+            cursor: "pointer",
+          }}
+        >
           <input
             type="checkbox"
             checked={checked}
             onChange={(e) => setChecked(e.target.checked)}
-          />{" "}
-          I have safely written down / saved my 24-word recovery phrase
+            style={{ marginTop: 3 }}
+          />
+          I have safely saved my 24-word Family Recovery Key.
         </label>
-      </div>
 
-      <button
-        onClick={onConfirmed}
-        disabled={!checked}
-        style={{
-          marginTop: 16,
-          opacity: checked ? 1 : 0.4,
-          cursor: checked ? "pointer" : "not-allowed",
-        }}
-      >
-        Continue to Vault →
-      </button>
+        <button
+          onClick={onConfirmed}
+          disabled={!checked}
+          style={{
+            marginTop: 18,
+            width: "100%",
+            padding: "13px",
+            background: "#6366f1",
+            color: "white",
+            border: "none",
+            borderRadius: 8,
+            fontSize: 15,
+            fontWeight: "bold",
+            opacity: checked ? 1 : 0.45,
+            cursor: checked ? "pointer" : "not-allowed",
+          }}
+        >
+          Continue to Aureva
+        </button>
+      </div>
     </div>
   );
 }

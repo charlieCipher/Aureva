@@ -2,80 +2,55 @@
 function TrustBadges() {
   const badges = [
     {
-      icon: "🔒",
-      title: "AES-256 Encryption",
-      desc: "Your files are encrypted on your device before upload. We never see your data.",
-      color: "#6366f1",
+      title: "Device-side encryption",
+      desc: "Files are encrypted on your device before upload.",
     },
     {
-      icon: "🧠",
-      title: "Only You Can Access",
-      desc: "Your recovery phrase is the only way to recover your data. We cannot reset it.",
-      color: "#10b981",
+      title: "Family Recovery Key",
+      desc: "Your key is shown once. Your file encryption key stays with you.",
     },
     {
-      icon: "♾️",
-      title: "Data Stays Forever",
-      desc: "We never delete your data — even on the free tier. Your vault is permanent.",
-      color: "#f59e0b",
-    },
-    {
-      icon: "👁️",
-      title: "Zero Knowledge",
-      desc: "We cannot read your files. Your encryption key never leaves your device.",
-      color: "#3b82f6",
+      title: "Private by design",
+      desc: "Aureva is built around minimum access and clear family instructions.",
     },
   ];
 
   return (
-    <div
+    <section
       style={{
-        background: "#1e293b",
-        borderRadius: 12,
-        padding: 24,
+        background: "rgba(255,255,250,0.88)",
+        border: "1px solid rgba(93,111,86,0.16)",
+        borderRadius: 24,
+        padding: 28,
         marginBottom: 24,
+        boxShadow: "0 24px 60px rgba(58,69,52,0.14)",
       }}
     >
-      <h2 style={{ margin: "0 0 6px 0", color: "white", fontSize: 18 }}>
-        🛡️ Security Promises
-      </h2>
-      <p style={{ margin: "0 0 20px 0", color: "#64748b", fontSize: 13 }}>
-        We built Continuum on these non-negotiable principles.
+      <p style={{ margin: "0 0 8px 0", color: "#7f9278", fontSize: 12, fontWeight: 900, letterSpacing: 1 }}>
+        TRUST
       </p>
-      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        {badges.map((b) => (
+      <h2 style={{ margin: "0 0 18px 0", color: "#171b14", fontSize: 28 }}>Security Promises</h2>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14 }}>
+        {badges.map((badge) => (
           <div
-            key={b.title}
+            key={badge.title}
             style={{
-              display: "flex",
-              alignItems: "flex-start",
-              gap: 14,
-              padding: "14px 16px",
-              background: "#0f172a",
-              borderRadius: 10,
-              borderLeft: `3px solid ${b.color}`,
+              background: "#f7f6f0",
+              border: "1px solid rgba(93,111,86,0.12)",
+              borderRadius: 18,
+              padding: 18,
             }}
           >
-            <span style={{ fontSize: 24, flexShrink: 0 }}>{b.icon}</span>
-            <div>
-              <p
-                style={{
-                  margin: "0 0 4px 0",
-                  color: "white",
-                  fontWeight: "bold",
-                  fontSize: 14,
-                }}
-              >
-                {b.title}
-              </p>
-              <p style={{ margin: 0, color: "#94a3b8", fontSize: 13 }}>
-                {b.desc}
-              </p>
-            </div>
+            <p style={{ margin: "0 0 6px 0", color: "#171b14", fontSize: 15, fontWeight: 850 }}>
+              {badge.title}
+            </p>
+            <p style={{ margin: 0, color: "#6f766a", fontSize: 13, lineHeight: 1.55 }}>
+              {badge.desc}
+            </p>
           </div>
         ))}
       </div>
-    </div>
+    </section>
   );
 }
 

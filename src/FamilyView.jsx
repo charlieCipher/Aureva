@@ -19,8 +19,20 @@ function FamilyView() {
     Other: { color: "#64748b", bg: "#0f172a", icon: "📁" },
   };
 
-  async function handleAccess() {
-    if (!pin) return setMessage("Please enter your PIN.");
+  useEffect(() => {
+    const savedPin = sessionStorage.getItem("family_access_pin");
+    if (savedPin && userId) {
+      sessionStorage.removeItem("family_access_pin");
+      setPin(savedPin);
+      handleAccess(savedPin);
+    }
+  }, [userId]);
+
+  async function handleAccess(pinOverride) {
+    const accessPin =
+      typeof pinOverride === "string" ? pinOverride.trim() : pin.trim();
+
+    if (!accessPin) return setMessage("Please enter your PIN.");
     if (!userId)
       return setMessage(
         "Invalid link. Please ask for the correct family link.",
@@ -34,7 +46,7 @@ function FamilyView() {
       .from("profiles")
       .select("id, family_code")
       .eq("id", userId)
-      .eq("family_code", pin)
+      .eq("family_code", accessPin)
       .single();
 
     if (profileError || !profile) {
@@ -84,7 +96,7 @@ function FamilyView() {
         >
           <div>
             <h1 style={{ margin: 0, fontSize: 24, color: "#6366f1" }}>
-              🔐 Continuum
+              🔐 Aureva
             </h1>
             <p style={{ margin: 0, fontSize: 12, color: "#64748b" }}>
               Family View — Read Only
@@ -181,7 +193,7 @@ function FamilyView() {
             />
 
             <button
-              onClick={handleAccess}
+              onClick={() => handleAccess()}
               disabled={loading || !userId}
               style={{
                 width: "100%",

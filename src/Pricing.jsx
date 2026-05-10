@@ -3,16 +3,16 @@ function Pricing({ onClose, userTier }) {
   const tiers = [
     {
       name: "Free",
-      price: "₹0",
+      price: "Rs. 0",
       storage: "50 MB",
-      features: ["Basic vault", "Upload & view files", "Add assets"],
+      features: ["Basic vault", "Add assets", "Upload and view files"],
       tier: "free",
       button: "Current Plan",
       disabled: true,
     },
     {
       name: "Standard",
-      price: "₹1,299",
+      price: "Rs. 1,299",
       storage: "2 GB",
       features: ["Everything in Free", "Family Instructions View", "Full vault"],
       tier: "standard",
@@ -21,7 +21,7 @@ function Pricing({ onClose, userTier }) {
     },
     {
       name: "Legacy Pack",
-      price: "₹6,999",
+      price: "Rs. 6,999",
       storage: "10 GB",
       features: ["Everything in Standard", "Legal Export PDF", "Priority support", "Future upgrades"],
       tier: "legacy",
@@ -31,99 +31,176 @@ function Pricing({ onClose, userTier }) {
   ];
 
   function handleUpgrade(tier) {
-    const message = `Hi, I want to upgrade my Continuum vault to ${tier} plan. My email is: `;
+    const message = `Hi, I want to upgrade my Aureva vault to ${tier} plan. My email is: `;
     window.open(`https://wa.me/919370096312?text=${encodeURIComponent(message)}`, "_blank");
   }
 
+  const pageStyle = {
+    minHeight: "100vh",
+    background:
+      "radial-gradient(circle at 12% 8%, rgba(255,255,250,0.95), transparent 32rem), linear-gradient(135deg, #e6ecdf 0%, #f8f7f1 50%, #dfe8dc 100%)",
+    color: "#171b14",
+    fontFamily:
+      'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+    padding: 24,
+  };
+
+  if (userTier === "admin") {
+    return (
+      <div style={pageStyle}>
+        <div style={{ maxWidth: 760, margin: "0 auto" }}>
+          <button
+            onClick={onClose}
+            style={{
+              marginBottom: 20,
+              padding: "10px 16px",
+              background: "rgba(255,255,250,0.78)",
+              color: "#5f6b59",
+              border: "1px solid rgba(93,111,86,0.16)",
+              cursor: "pointer",
+              borderRadius: 999,
+              fontWeight: 800,
+            }}
+          >
+            Back
+          </button>
+          <div
+            style={{
+              background: "rgba(255,255,250,0.9)",
+              border: "1px solid rgba(93,111,86,0.16)",
+              borderRadius: 28,
+              padding: 38,
+              textAlign: "center",
+              boxShadow: "0 24px 60px rgba(58,69,52,0.14)",
+            }}
+          >
+            <p style={{ margin: "0 0 10px 0", color: "#7f9278", fontSize: 12, fontWeight: 900, letterSpacing: 1 }}>
+              ADMIN ACCESS
+            </p>
+            <h1 style={{ margin: "0 0 8px 0", color: "#171b14", fontSize: 34 }}>
+              Monetization disabled for this account
+            </h1>
+            <p style={{ margin: 0, color: "#6f766a", fontSize: 15, lineHeight: 1.6 }}>
+              This email has full Aureva access without payment prompts.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div style={{
-      minHeight: "100vh", background: "#0f172a", color: "white",
-      fontFamily: "Arial", padding: "20px",
-    }}>
-      <div style={{ maxWidth: 600, margin: "0 auto" }}>
+    <div style={pageStyle}>
+      <div style={{ maxWidth: 1120, margin: "0 auto" }}>
         <button
           onClick={onClose}
           style={{
-            marginBottom: 20, padding: "8px 16px", background: "#1e293b",
-            color: "white", border: "none", cursor: "pointer", borderRadius: 8, fontSize: 14,
+            marginBottom: 22,
+            padding: "10px 16px",
+            background: "rgba(255,255,250,0.78)",
+            color: "#5f6b59",
+            border: "1px solid rgba(93,111,86,0.16)",
+            cursor: "pointer",
+            borderRadius: 999,
+            fontWeight: 800,
           }}
         >
-          ← Back
+          Back
         </button>
 
-        <h1 style={{ margin: "0 0 8px 0", color: "#6366f1", fontSize: 24 }}>⭐ Upgrade Your Vault</h1>
-        <p style={{ margin: "0 0 32px 0", color: "#64748b", fontSize: 14 }}>
-          Pay once. Your data stays safe forever.
-        </p>
+        <div style={{ marginBottom: 28 }}>
+          <p style={{ margin: "0 0 8px 0", color: "#7f9278", fontSize: 12, fontWeight: 900, letterSpacing: 1 }}>
+            PRICING
+          </p>
+          <h1 style={{ margin: "0 0 8px 0", color: "#171b14", fontSize: 46, lineHeight: 1.05 }}>
+            Choose how your family prepares.
+          </h1>
+          <p style={{ margin: 0, color: "#6f766a", fontSize: 15 }}>
+            Pay once. Your data stays safe forever.
+          </p>
+        </div>
 
-        {tiers.map((t) => (
-          <div key={t.name} style={{
-            background: t.tier === "legacy" ? "#1e1b4b" : "#1e293b",
-            borderRadius: 12, padding: 24, marginBottom: 16,
-            border: t.tier === "legacy" ? "1px solid #6366f1" : "1px solid #334155",
-          }}>
-            {t.tier === "legacy" && (
-              <span style={{
-                background: "#6366f1", color: "white", fontSize: 11,
-                padding: "2px 10px", borderRadius: 20, fontWeight: "bold", marginBottom: 8, display: "inline-block",
-              }}>
-                BEST VALUE
-              </span>
-            )}
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-              <div>
-                <h2 style={{ margin: 0, color: "white", fontSize: 20 }}>{t.name}</h2>
-                <p style={{ margin: "4px 0 0 0", color: "#64748b", fontSize: 13 }}>{t.storage} storage</p>
-              </div>
-              <p style={{ margin: 0, fontSize: 24, fontWeight: "bold", color: "#6366f1" }}>{t.price}</p>
-            </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 18 }}>
+          {tiers.map((tier) => {
+            const isCurrent = userTier === tier.tier;
+            const featured = tier.tier === "standard";
+            return (
+              <div
+                key={tier.name}
+                style={{
+                  background: featured ? "#7f9278" : "rgba(255,255,250,0.9)",
+                  color: featured ? "#fffefa" : "#171b14",
+                  border: featured ? "1px solid #7f9278" : "1px solid rgba(93,111,86,0.16)",
+                  borderRadius: 28,
+                  padding: 28,
+                  boxShadow: featured
+                    ? "0 24px 60px rgba(95,115,89,0.24)"
+                    : "0 24px 60px rgba(58,69,52,0.12)",
+                }}
+              >
+                {featured && (
+                  <span
+                    style={{
+                      display: "inline-flex",
+                      marginBottom: 14,
+                      padding: "5px 10px",
+                      background: "rgba(255,255,250,0.16)",
+                      borderRadius: 999,
+                      fontSize: 11,
+                      fontWeight: 900,
+                    }}
+                  >
+                    RECOMMENDED
+                  </span>
+                )}
+                <h2 style={{ margin: "0 0 4px 0", color: "inherit", fontSize: 26 }}>{tier.name}</h2>
+                <p style={{ margin: "0 0 18px 0", color: featured ? "rgba(255,255,250,0.75)" : "#6f766a", fontSize: 13 }}>
+                  {tier.storage} storage
+                </p>
+                <p style={{ margin: "0 0 22px 0", fontSize: 34, fontWeight: 900 }}>{tier.price}</p>
 
-            {t.features.map((f) => (
-              <p key={f} style={{ margin: "0 0 6px 0", color: "#94a3b8", fontSize: 13 }}>
-                ✓ {f}
-              </p>
-            ))}
-
-            {userTier === t.tier ? (
-              <div style={{
-                marginTop: 16, padding: "10px", background: "#10b981",
-                borderRadius: 8, textAlign: "center", fontSize: 14, fontWeight: "bold",
-              }}>
-                ✅ Your Current Plan
-              </div>
-            ) : t.disabled ? null : (
-              <>
-                <button
-                  onClick={() => handleUpgrade(t.name)}
-                  style={{
-                    marginTop: 16, width: "100%", padding: "12px",
-                    background: "#6366f1", color: "white", border: "none",
-                    cursor: "pointer", borderRadius: 8, fontSize: 15, fontWeight: "bold",
-                  }}
-                >
-                  {t.button} →
-                </button>
-                <div style={{ marginTop: 12, background: "#0f172a", borderRadius: 8, padding: 12 }}>
-                  <p style={{ margin: "0 0 4px 0", color: "#64748b", fontSize: 12 }}>PAY VIA UPI</p>
-                  <p style={{ margin: "0 0 4px 0", color: "white", fontSize: 14, fontWeight: "bold" }}>
-                    9763932393@ibl
-                  </p>
-                  <p style={{ margin: 0, color: "#64748b", fontSize: 12 }}>
-                    After payment, click the button above to send screenshot on WhatsApp
-                  </p>
+                <div style={{ display: "grid", gap: 9, marginBottom: 22 }}>
+                  {tier.features.map((feature) => (
+                    <p key={feature} style={{ margin: 0, color: featured ? "#fffefa" : "#5f6b59", fontSize: 14 }}>
+                      {feature}
+                    </p>
+                  ))}
                 </div>
-              </>
-            )}
-          </div>
-        ))}
 
-        <div style={{ background: "#1e293b", borderRadius: 12, padding: 20, marginTop: 8 }}>
-          <p style={{ margin: "0 0 4px 0", color: "#10b981", fontSize: 14, fontWeight: "bold" }}>
-            🔒 Data never deleted
-          </p>
-          <p style={{ margin: 0, color: "#64748b", fontSize: 13 }}>
-            Even on the free tier, your data is safe forever. Upgrading only unlocks more storage and features.
-          </p>
+                {isCurrent ? (
+                  <div
+                    style={{
+                      padding: "12px",
+                      background: featured ? "rgba(255,255,250,0.14)" : "#e8eee4",
+                      borderRadius: 999,
+                      textAlign: "center",
+                      fontSize: 14,
+                      fontWeight: 850,
+                    }}
+                  >
+                    Your Current Plan
+                  </div>
+                ) : tier.disabled ? null : (
+                  <button
+                    onClick={() => handleUpgrade(tier.name)}
+                    style={{
+                      width: "100%",
+                      padding: "13px",
+                      background: featured ? "#fffefa" : "#171b14",
+                      color: featured ? "#171b14" : "#fffefa",
+                      border: featured ? "1px solid #fffefa" : "1px solid #171b14",
+                      cursor: "pointer",
+                      borderRadius: 999,
+                      fontSize: 15,
+                      fontWeight: 850,
+                    }}
+                  >
+                    {tier.button}
+                  </button>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
