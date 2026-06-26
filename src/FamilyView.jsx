@@ -32,10 +32,10 @@ function FamilyView() {
     const accessPin =
       typeof pinOverride === "string" ? pinOverride.trim() : pin.trim();
 
-    if (!accessPin) return setMessage("Please enter your PIN.");
+    if (!accessPin) return setMessage("Please enter your continuity code.");
     if (!userId)
       return setMessage(
-        "Invalid link. Please ask for the correct family link.",
+        "Invalid link. Please ask for the correct family continuity link.",
       );
 
     setLoading(true);
@@ -50,7 +50,7 @@ function FamilyView() {
       .single();
 
     if (profileError || !profile) {
-      setMessage("❌ Wrong PIN. Please try again.");
+      setMessage("Wrong continuity code. Please try again.");
       setLoading(false);
       return;
     }
@@ -63,7 +63,7 @@ function FamilyView() {
       .order("created_at", { ascending: false });
 
     if (assetError || !assetData || assetData.length === 0) {
-      setMessage("No assets found.");
+      setMessage("No continuity records found.");
       setLoading(false);
       return;
     }
@@ -99,7 +99,7 @@ function FamilyView() {
               🔐 Aureva
             </h1>
             <p style={{ margin: 0, fontSize: 12, color: "#64748b" }}>
-              Family View — Read Only
+              Shared Family View - Read Only
             </p>
           </div>
           <button
@@ -137,7 +137,7 @@ function FamilyView() {
                 textAlign: "center",
               }}
             >
-              Family Access
+              Shared Family Access
             </h2>
             <p
               style={{
@@ -147,7 +147,7 @@ function FamilyView() {
                 textAlign: "center",
               }}
             >
-              Enter the PIN shared by your loved one.
+              Enter the continuity code shared by your family member.
             </p>
 
             {!userId && (
@@ -161,18 +161,17 @@ function FamilyView() {
                 }}
               >
                 <p style={{ margin: 0, color: "#ef4444", fontSize: 13 }}>
-                  ❌ Invalid link. Please ask your family member for the correct
-                  link.
+                  Invalid link. Please ask your family member for the correct link.
                 </p>
               </div>
             )}
 
             <p style={{ margin: "0 0 6px 0", color: "#64748b", fontSize: 12 }}>
-              FAMILY PIN
+              CONTINUITY CODE
             </p>
             <input
               type="password"
-              placeholder="Enter PIN"
+              placeholder="Enter continuity code"
               value={pin}
               onChange={(e) => setPin(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleAccess()}
@@ -207,7 +206,7 @@ function FamilyView() {
                 fontWeight: "bold",
               }}
             >
-              {loading ? "Verifying..." : "🔓 Access Vault"}
+              {loading ? "Verifying..." : "Open Shared Family View"}
             </button>
 
             {message && (

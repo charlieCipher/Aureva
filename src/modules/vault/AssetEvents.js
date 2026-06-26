@@ -1,0 +1,8 @@
+import { EVENT_TYPES } from "../events/event-types";
+
+export const ASSET_EVENTS = {
+  CREATED: EVENT_TYPES.ASSET_CREATED,
+  UPDATED: EVENT_TYPES.ASSET_UPDATED,
+  DELETED: EVENT_TYPES.ASSET_DELETED,
+};
+

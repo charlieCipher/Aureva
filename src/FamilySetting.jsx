@@ -21,7 +21,7 @@ function FamilySettings({ session }) {
         .eq("id", session.user.id)
         .maybeSingle();
 
-      if (error) setMessage("Could not load existing PIN. You can still set a new one.");
+      if (error) setMessage("Could not load existing continuity code. You can still set a new one.");
 
       if (data?.family_code) {
         setPin(data.family_code);
@@ -34,7 +34,7 @@ function FamilySettings({ session }) {
 
   async function savePin() {
     if (!pin || pin.length < 4) {
-      setMessage("PIN must be at least 4 characters.");
+      setMessage("Continuity code must be at least 4 characters.");
       return;
     }
 
@@ -48,7 +48,7 @@ function FamilySettings({ session }) {
     if (error) {
       setMessage("Failed: " + error.message);
     } else {
-      setMessage("PIN saved.");
+      setMessage("Continuity code saved.");
       setShareLink(`${window.location.origin}/family#${session.user.id}`);
     }
 
@@ -57,7 +57,7 @@ function FamilySettings({ session }) {
 
   async function copyLink() {
     await navigator.clipboard.writeText(shareLink);
-    setMessage("Link copied. Share this link and PIN privately with family.");
+    setMessage("Link copied. Share this link and continuity code privately with trusted family members.");
   }
 
   const inputStyle = {
@@ -65,10 +65,10 @@ function FamilySettings({ session }) {
     width: "100%",
     marginBottom: 12,
     padding: "13px 15px",
-    background: "#fffefa",
-    border: "1px solid rgba(93,111,86,0.2)",
+    background: "#FFFFFF",
+    border: "1px solid #ECECF2",
     borderRadius: 16,
-    color: "#171b14",
+    color: "#111827",
     fontSize: 16,
     boxSizing: "border-box",
     letterSpacing: 4,
@@ -77,47 +77,50 @@ function FamilySettings({ session }) {
   return (
     <section
       style={{
-        background: "rgba(255,255,250,0.88)",
-        border: "1px solid rgba(93,111,86,0.16)",
+        background: "#FFFFFF",
+        border: "1px solid #ECECF2",
         borderRadius: 24,
-        boxShadow: "0 24px 60px rgba(58,69,52,0.14)",
+        boxShadow: "0 24px 60px rgba(17,24,39,0.08)",
         padding: 28,
         marginBottom: 24,
       }}
     >
       <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 0.9fr) minmax(280px, 1.1fr)", gap: 24 }}>
         <div>
-          <p style={{ margin: "0 0 8px 0", color: "#7f9278", fontSize: 12, fontWeight: 900, letterSpacing: 1 }}>
-            FAMILY VIEW
+          <p style={{ margin: "0 0 8px 0", color: "#6D5EF5", fontSize: 12, fontWeight: 900, letterSpacing: 1 }}>
+            CONTINUITY ACCESS
           </p>
-          <h2 style={{ margin: "0 0 10px 0", color: "#171b14", fontSize: 30 }}>
+          <h2 style={{ margin: "0 0 10px 0", color: "#111827", fontSize: 30 }}>
             Share clear read-only access.
           </h2>
-          <p style={{ margin: "0 0 18px 0", color: "#6f766a", fontSize: 14, lineHeight: 1.6 }}>
-            Set one private family PIN, then share the link and PIN with trusted people.
+          <p style={{ margin: "0 0 18px 0", color: "#6B7280", fontSize: 14, lineHeight: 1.6 }}>
+            Set one private continuity code, then share the link and code with trusted family members.
           </p>
-          <div style={{ background: "#f4f2e9", borderRadius: 18, padding: 16 }}>
+          <div style={{ background: "#F4F2FF", borderRadius: 18, padding: 16 }}>
             {[
-              "Set a private family PIN.",
-              "Copy the family access link.",
-              "Share both privately with your family.",
-              "They open a read-only view of your records.",
+              "Set a private continuity code.",
+              "Copy the family continuity link.",
+              "Share both privately with trusted family members.",
+              "They open the same read-only continuity view of your records.",
             ].map((step) => (
               <p key={step} style={{ margin: "0 0 8px 0", color: "#5f6b59", fontSize: 13 }}>
                 {step}
               </p>
             ))}
           </div>
+          <p style={{ margin: "14px 0 0 0", color: "#6B7280", fontSize: 12, lineHeight: 1.5 }}>
+            MVP note: this is one shared family view. Separate access for each person will be added later after the core vault is stable.
+          </p>
         </div>
 
         <div>
           {loading && (
-            <p style={{ margin: "0 0 12px 0", color: "#6f766a", fontSize: 13 }}>
-              Checking saved PIN...
+            <p style={{ margin: "0 0 12px 0", color: "#6B7280", fontSize: 13 }}>
+              Checking saved continuity code...
             </p>
           )}
-          <p style={{ margin: "0 0 6px 0", color: "#6f766a", fontSize: 12, fontWeight: 800 }}>
-            YOUR FAMILY PIN
+          <p style={{ margin: "0 0 6px 0", color: "#6B7280", fontSize: 12, fontWeight: 800 }}>
+            CONTINUITY ACCESS CODE
           </p>
           <input
             type="text"
@@ -132,9 +135,9 @@ function FamilySettings({ session }) {
             style={{
               width: "100%",
               padding: "14px",
-              background: "#171b14",
-              color: "#fffefa",
-              border: "1px solid #171b14",
+              background: "#111827",
+              color: "#FFFFFF",
+              border: "1px solid #111827",
               cursor: saving ? "not-allowed" : "pointer",
               borderRadius: 999,
               fontSize: 15,
@@ -143,35 +146,35 @@ function FamilySettings({ session }) {
               opacity: saving ? 0.7 : 1,
             }}
           >
-            {saving ? "Saving..." : "Save PIN"}
+            {saving ? "Saving..." : "Save Code"}
           </button>
 
           {shareLink && (
-            <div style={{ background: "#f4f2e9", borderRadius: 18, padding: 16, marginTop: 8 }}>
-              <p style={{ margin: "0 0 8px 0", color: "#5f7359", fontSize: 13, fontWeight: 850 }}>
-                Share with your family
+            <div style={{ background: "#F4F2FF", borderRadius: 18, padding: 16, marginTop: 8 }}>
+              <p style={{ margin: "0 0 8px 0", color: "#6D5EF5", fontSize: 13, fontWeight: 850 }}>
+                Share with trusted family members
               </p>
-              <p style={{ margin: "0 0 10px 0", color: "#6f766a", fontSize: 12, wordBreak: "break-all" }}>
+              <p style={{ margin: "0 0 10px 0", color: "#6B7280", fontSize: 12, wordBreak: "break-all" }}>
                 {shareLink}
               </p>
-              <p style={{ margin: "0 0 12px 0", color: "#6f766a", fontSize: 13 }}>
-                PIN: <strong style={{ color: "#171b14" }}>{pin}</strong>
+              <p style={{ margin: "0 0 12px 0", color: "#6B7280", fontSize: 13 }}>
+                Code: <strong style={{ color: "#111827" }}>{pin}</strong>
               </p>
               <button
                 onClick={copyLink}
                 style={{
                   width: "100%",
                   padding: "11px",
-                  background: "#7f9278",
-                  color: "#fffefa",
-                  border: "1px solid #7f9278",
+                  background: "#6D5EF5",
+                  color: "#FFFFFF",
+                  border: "1px solid #6D5EF5",
                   cursor: "pointer",
                   borderRadius: 999,
                   fontSize: 14,
                   fontWeight: 800,
                 }}
               >
-                Copy Family Link
+                Copy Continuity Link
               </button>
             </div>
           )}
@@ -179,7 +182,7 @@ function FamilySettings({ session }) {
           {message && (
             <p
               style={{
-                color: message.startsWith("Failed") || message.startsWith("Could not") ? "#b8554f" : "#5f7359",
+                color: message.startsWith("Failed") || message.startsWith("Could not") ? "#EF4444" : "#6D5EF5",
                 fontSize: 14,
                 marginTop: 10,
               }}

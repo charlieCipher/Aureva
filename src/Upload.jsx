@@ -19,10 +19,10 @@ function Upload({ session }) {
     width: "100%",
     marginBottom: 12,
     padding: "13px 15px",
-    background: "#fffefa",
-    border: "1px solid rgba(93,111,86,0.2)",
+    background: "#FFFFFF",
+    border: "1px solid #ECECF2",
     borderRadius: 16,
-    color: "#171b14",
+    color: "#111827",
     fontSize: 14,
     boxSizing: "border-box",
   };
@@ -107,11 +107,11 @@ function Upload({ session }) {
   return (
     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 18 }}>
       <section>
-        <p style={{ margin: "0 0 8px 0", color: "#7f9278", fontSize: 12, fontWeight: 900, letterSpacing: 1 }}>
+        <p style={{ margin: "0 0 8px 0", color: "#6D5EF5", fontSize: 12, fontWeight: 900, letterSpacing: 1 }}>
           SECURE UPLOAD
         </p>
-        <h2 style={{ margin: "0 0 10px 0", color: "#171b14", fontSize: 28 }}>Upload File</h2>
-        <p style={{ margin: "0 0 18px 0", color: "#6f766a", fontSize: 14, lineHeight: 1.6 }}>
+        <h2 style={{ margin: "0 0 10px 0", color: "#111827", fontSize: 28 }}>Upload File</h2>
+        <p style={{ margin: "0 0 18px 0", color: "#6B7280", fontSize: 14, lineHeight: 1.6 }}>
           Encrypted locally before upload. Keep your encryption key safely.
         </p>
         <input
@@ -128,9 +128,9 @@ function Upload({ session }) {
           style={{
             width: "100%",
             padding: "14px",
-            background: "#171b14",
-            color: "#fffefa",
-            border: "1px solid #171b14",
+            background: "#111827",
+            color: "#FFFFFF",
+            border: "1px solid #111827",
             cursor: uploading ? "not-allowed" : "pointer",
             borderRadius: 999,
             fontSize: 15,
@@ -143,14 +143,14 @@ function Upload({ session }) {
 
       <section>
         <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", marginBottom: 10 }}>
-          <h2 style={{ margin: 0, color: "#171b14", fontSize: 28 }}>Your Files</h2>
+          <h2 style={{ margin: 0, color: "#111827", fontSize: 28 }}>Your Files</h2>
           <button
             onClick={fetchFiles}
             style={{
               padding: "8px 14px",
-              background: "#f4f2e9",
+              background: "#F4F2FF",
               color: "#5f6b59",
-              border: "1px solid rgba(93,111,86,0.16)",
+              border: "1px solid #ECECF2",
               cursor: "pointer",
               borderRadius: 999,
               fontSize: 12,
@@ -167,7 +167,7 @@ function Upload({ session }) {
           onChange={(e) => setDecryptKey(e.target.value)}
           style={inputStyle}
         />
-        {files.length === 0 && <p style={{ color: "#6f766a", fontSize: 14 }}>No files uploaded yet.</p>}
+        {files.length === 0 && <p style={{ color: "#6B7280", fontSize: 14 }}>No files uploaded yet.</p>}
         <div style={{ display: "grid", gap: 10 }}>
           {files.map((item) => (
             <div
@@ -178,19 +178,19 @@ function Upload({ session }) {
                 alignItems: "center",
                 gap: 12,
                 padding: "12px 14px",
-                background: "#f7f6f0",
+                background: "#FFFFFF",
                 border: "1px solid rgba(93,111,86,0.12)",
                 borderRadius: 16,
               }}
             >
-              <span style={{ color: "#6f766a", fontSize: 13, overflowWrap: "anywhere" }}>{item.name}</span>
+              <span style={{ color: "#6B7280", fontSize: 13, overflowWrap: "anywhere" }}>{item.name}</span>
               <button
                 onClick={() => handleDecrypt(item.name)}
                 style={{
                   padding: "8px 13px",
-                  background: "#7f9278",
-                  color: "#fffefa",
-                  border: "1px solid #7f9278",
+                  background: "#6D5EF5",
+                  color: "#FFFFFF",
+                  border: "1px solid #6D5EF5",
                   cursor: "pointer",
                   borderRadius: 999,
                   fontSize: 13,
@@ -205,7 +205,7 @@ function Upload({ session }) {
 
         {decryptedContent && (
           <div style={{ marginTop: 16, padding: 16, background: "#eef4ea", borderRadius: 18 }}>
-            <p style={{ color: "#5f7359", margin: "0 0 4px 0", fontSize: 14, fontWeight: 800 }}>
+            <p style={{ color: "#6D5EF5", margin: "0 0 4px 0", fontSize: 14, fontWeight: 800 }}>
               Ready: {decryptedFileName}
             </p>
             <button
@@ -213,9 +213,9 @@ function Upload({ session }) {
               style={{
                 width: "100%",
                 padding: "11px",
-                background: "#171b14",
-                color: "#fffefa",
-                border: "1px solid #171b14",
+                background: "#111827",
+                color: "#FFFFFF",
+                border: "1px solid #111827",
                 cursor: "pointer",
                 borderRadius: 999,
                 fontSize: 14,
@@ -228,7 +228,7 @@ function Upload({ session }) {
         )}
 
         {message && (
-          <p style={{ color: message.includes("success") || message.includes("uploaded") ? "#5f7359" : "#b8554f", marginTop: 12, fontSize: 14 }}>
+          <p style={{ color: message.includes("success") || message.includes("uploaded") ? "#6D5EF5" : "#EF4444", marginTop: 12, fontSize: 14 }}>
             {message}
           </p>
         )}

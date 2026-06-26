@@ -17,10 +17,10 @@ function Auth() {
     width: "100%",
     marginBottom: 12,
     padding: "14px 16px",
-    background: "#fffefa",
-    border: "1px solid rgba(93,111,86,0.2)",
+    background: "#FFFFFF",
+    border: "1px solid #ECECF2",
     borderRadius: 16,
-    color: "#171b14",
+    color: "#111827",
     fontSize: 15,
     boxSizing: "border-box",
   };
@@ -64,7 +64,7 @@ function Auth() {
     const code = familyCode.trim();
 
     if (code.length < 4) {
-      setMessage("Enter the family access code shared with you.");
+      setMessage("Enter the continuity code shared with you.");
       return;
     }
 
@@ -80,7 +80,7 @@ function Auth() {
     setLoading(false);
 
     if (error || !data || data.length === 0) {
-      setMessage("Invalid family access code.");
+      setMessage("Invalid continuity code.");
       return;
     }
 
@@ -106,27 +106,27 @@ function Auth() {
           style={{
             width: "100%",
             maxWidth: 520,
-            background: "rgba(255,255,250,0.9)",
-            border: "1px solid rgba(93,111,86,0.16)",
+            background: "#FFFFFF",
+            border: "1px solid #ECECF2",
             borderRadius: 28,
             padding: 34,
-            boxShadow: "0 24px 60px rgba(58,69,52,0.14)",
+            boxShadow: "0 24px 60px rgba(17,24,39,0.08)",
             textAlign: "center",
           }}
         >
-          <p style={{ margin: "0 0 10px 0", color: "#7f9278", fontSize: 12, fontWeight: 900, letterSpacing: 1 }}>
+          <p style={{ margin: "0 0 10px 0", color: "#6D5EF5", fontSize: 12, fontWeight: 900, letterSpacing: 1 }}>
             VERIFY EMAIL
           </p>
-          <h2 style={{ margin: "0 0 10px 0", color: "#171b14", fontSize: 32 }}>
+          <h2 style={{ margin: "0 0 10px 0", color: "#111827", fontSize: 32 }}>
             Activate Your Family Vault
           </h2>
-          <p style={{ margin: "0 0 18px 0", color: "#6f766a", fontSize: 14, lineHeight: 1.6 }}>
+          <p style={{ margin: "0 0 18px 0", color: "#6B7280", fontSize: 14, lineHeight: 1.6 }}>
             We sent a secure verification link to <strong>{email}</strong>.
           </p>
 
           <div
             style={{
-              background: "#f4f2e9",
+              background: "#F4F2FF",
               borderRadius: 18,
               padding: 18,
               marginBottom: 18,
@@ -156,9 +156,9 @@ function Auth() {
             style={{
               width: "100%",
               padding: "13px",
-              background: "#171b14",
-              color: "#fffefa",
-              border: "1px solid #171b14",
+              background: "#111827",
+              color: "#FFFFFF",
+              border: "1px solid #111827",
               cursor: "pointer",
               borderRadius: 999,
               fontWeight: 800,
@@ -172,12 +172,12 @@ function Auth() {
               setWaitingVerification(false);
               setIsLogin(true);
             }}
-            style={{ margin: "16px 0 0 0", color: "#5f7359", cursor: "pointer", fontSize: 14, fontWeight: 700 }}
+            style={{ margin: "16px 0 0 0", color: "#6D5EF5", cursor: "pointer", fontSize: 14, fontWeight: 700 }}
           >
             Already verified? Login here
           </p>
 
-          {message && <p style={{ color: "#5f7359", fontSize: 13, marginTop: 12 }}>{message}</p>}
+          {message && <p style={{ color: "#6D5EF5", fontSize: 13, marginTop: 12 }}>{message}</p>}
         </div>
       </div>
     );
@@ -197,11 +197,11 @@ function Auth() {
       >
         <section
           style={{
-            background: "rgba(255,255,250,0.72)",
+            background: "#FFFFFF",
             border: "1px solid rgba(93,111,86,0.14)",
             borderRadius: 32,
             padding: 44,
-            boxShadow: "0 24px 60px rgba(58,69,52,0.12)",
+            boxShadow: "0 24px 60px rgba(17,24,39,0.08)",
             display: "flex",
             flexDirection: "column",
             justifyContent: "space-between",
@@ -214,8 +214,8 @@ function Auth() {
                 width: 46,
                 height: 46,
                 borderRadius: 17,
-                background: "#171b14",
-                color: "#fffefa",
+                background: "#111827",
+                color: "#FFFFFF",
                 display: "grid",
                 placeItems: "center",
                 fontWeight: 900,
@@ -224,21 +224,25 @@ function Auth() {
             >
               A
             </div>
-            <p style={{ margin: "0 0 14px 0", color: "#7f9278", fontSize: 13, fontWeight: 900, letterSpacing: 1 }}>
-              AUREVA
+            <p style={{ margin: "0 0 8px 0", color: "#111827", fontSize: 22, fontWeight: 900 }}>
+              Aureva
             </p>
-            <h1 style={{ margin: 0, color: "#171b14", fontSize: 58, lineHeight: 1.02, letterSpacing: 0 }}>
-              Legacy planning that feels calm.
+            <p style={{ margin: "0 0 14px 0", color: "#6D5EF5", fontSize: 13, fontWeight: 900, letterSpacing: 1 }}>
+              SECURE LEGACY CONTINUITY VAULT
+            </p>
+            <h1 style={{ margin: 0, color: "#111827", fontSize: 58, lineHeight: 1.02, letterSpacing: 0 }}>
+              Your legacy is protected.
             </h1>
-            <p style={{ margin: "18px 0 0 0", color: "#6f766a", fontSize: 16, lineHeight: 1.7, maxWidth: 560 }}>
-              Organize assets, instructions, and family access in one private workspace built for Indian families.
+            <p style={{ margin: "18px 0 0 0", color: "#6B7280", fontSize: 16, lineHeight: 1.7, maxWidth: 560 }}>
+              Protect critical personal, legal, financial, emotional, and family information
+              for future generations.
             </p>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12, marginTop: 36 }}>
-            {["Assets", "Family View", "Export"].map((item) => (
-              <div key={item} style={{ background: "#f4f2e9", borderRadius: 18, padding: 16 }}>
-                <p style={{ margin: 0, color: "#171b14", fontWeight: 850 }}>{item}</p>
-                <p style={{ margin: "4px 0 0 0", color: "#6f766a", fontSize: 12 }}>Prepared clearly</p>
+            {["Continuity Records", "Shared Family View", "Continuity Export"].map((item) => (
+              <div key={item} style={{ background: "#F4F2FF", borderRadius: 18, padding: 16 }}>
+                <p style={{ margin: 0, color: "#111827", fontWeight: 850 }}>{item}</p>
+                <p style={{ margin: "4px 0 0 0", color: "#6B7280", fontSize: 12 }}>Protected clearly</p>
               </div>
             ))}
           </div>
@@ -246,26 +250,28 @@ function Auth() {
 
         <section
           style={{
-            background: "rgba(255,255,250,0.9)",
-            border: "1px solid rgba(93,111,86,0.16)",
+            background: "#FFFFFF",
+            border: "1px solid #ECECF2",
             borderRadius: 32,
             padding: 34,
-            boxShadow: "0 24px 60px rgba(58,69,52,0.14)",
+            boxShadow: "0 24px 60px rgba(17,24,39,0.08)",
           }}
         >
-          <h2 style={{ margin: "0 0 8px 0", color: "#171b14", fontSize: 30 }}>
-            {isFamilyLogin ? "Family access" : isLogin ? "Welcome back" : "Create account"}
+          <h2 style={{ margin: "0 0 8px 0", color: "#111827", fontSize: 30 }}>
+            {isFamilyLogin ? "Continuity access" : isLogin ? "Welcome back" : "Create account"}
           </h2>
-          <p style={{ margin: "0 0 24px 0", color: "#6f766a", fontSize: 14, lineHeight: 1.6 }}>
+          <p style={{ margin: "0 0 24px 0", color: "#6B7280", fontSize: 14, lineHeight: 1.6 }}>
             {isFamilyLogin
-              ? "Use the code shared by your family member."
-              : "Enter your details to continue your Aureva workspace."}
+              ? "Use the continuity code shared by your family member."
+              : isLogin
+                ? "Trusted device login. Unlock your vault with your current method."
+                : "New device setup. Email, password, and recovery verification protect the vault."}
           </p>
 
           {isFamilyLogin ? (
             <input
               type="password"
-              placeholder="Family access code"
+              placeholder="Continuity access code"
               value={familyCode}
               onChange={(e) => setFamilyCode(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleFamilyLogin()}
@@ -287,6 +293,31 @@ function Auth() {
                 onChange={(e) => setPassword(e.target.value)}
                 style={inputStyle}
               />
+              {isLogin && (
+                <div style={{ background: "#F4F2FF", borderRadius: 18, padding: 14, marginBottom: 14 }}>
+                  <p style={{ margin: "0 0 10px 0", color: "#6D5EF5", fontSize: 12, fontWeight: 900, letterSpacing: 1 }}>
+                    UNLOCK METHODS
+                  </p>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                    {["Password", "Passkey ready", "Windows Hello ready", "Recovery wizard"].map((method) => (
+                      <span
+                        key={method}
+                        style={{
+                          padding: "7px 10px",
+                          borderRadius: 999,
+                          background: "#FFFFFF",
+                          border: "1px solid #ECECF2",
+                          color: "#111827",
+                          fontSize: 12,
+                          fontWeight: 800,
+                        }}
+                      >
+                        {method}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
             </>
           )}
 
@@ -296,9 +327,9 @@ function Auth() {
             style={{
               width: "100%",
               padding: "14px",
-              background: "#171b14",
-              color: "#fffefa",
-              border: "1px solid #171b14",
+              background: "#111827",
+              color: "#FFFFFF",
+              border: "1px solid #111827",
               cursor: loading ? "not-allowed" : "pointer",
               borderRadius: 999,
               fontSize: 15,
@@ -306,12 +337,12 @@ function Auth() {
               opacity: loading ? 0.7 : 1,
             }}
           >
-            {loading ? "Please wait..." : isFamilyLogin ? "Access Family View" : isLogin ? "Login" : "Sign Up"}
+            {loading ? "Please wait..." : isFamilyLogin ? "Open Continuity View" : isLogin ? "Login" : "Sign Up"}
           </button>
 
           {!isFamilyLogin && (
             <p
-              style={{ marginTop: 16, color: "#5f7359", cursor: "pointer", textAlign: "center", fontSize: 14, fontWeight: 750 }}
+              style={{ marginTop: 16, color: "#6D5EF5", cursor: "pointer", textAlign: "center", fontSize: 14, fontWeight: 750 }}
               onClick={() => setIsLogin(!isLogin)}
             >
               {isLogin ? "No account? Sign up" : "Have an account? Login"}
@@ -321,7 +352,7 @@ function Auth() {
           <p
             style={{
               marginTop: isFamilyLogin ? 16 : 8,
-              color: "#6f766a",
+              color: "#6B7280",
               cursor: "pointer",
               textAlign: "center",
               fontSize: 14,
@@ -335,7 +366,7 @@ function Auth() {
           </p>
 
           {message && (
-            <p style={{ color: "#b8554f", textAlign: "center", fontSize: 13, marginTop: 14 }}>
+            <p style={{ color: "#EF4444", textAlign: "center", fontSize: 13, marginTop: 14 }}>
               {message}
             </p>
           )}
