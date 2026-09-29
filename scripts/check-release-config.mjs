@@ -13,8 +13,9 @@ export function validateReleaseConfig(env) {
       'GIT_COMMIT_SHA','GIT_COMMIT_MESSAGE','GIT_COMMIT_AUTHOR_LOGIN',
       'GIT_COMMIT_AUTHOR_NAME','GIT_PULL_REQUEST_ID'].map(name => `VITE_VERCEL_${name}`),
   ]);
-  if (Object.keys(env).some(name => name.startsWith('VITE_') && !allowed.has(name)))
-    issues.push('Unexpected browser-exposed environment variable. Review the explicit allowlist.');
+  const unexpected = Object.keys(env).filter(name => name.startsWith('VITE_') && !allowed.has(name));
+  if (unexpected.length)
+    issues.push(`Unexpected browser-exposed environment variable. Review the explicit allowlist: ${unexpected.map(name => /^VITE_[A-Z0-9_]{1,80}$/.test(name) ? name : '[invalid name]').join(', ')}`);
   try {
     const url = new URL(env.VITE_SUPABASE_URL?.trim());
     if (url.protocol !== 'https:' || !/^[a-z]{20}\.supabase\.co$/.test(url.hostname) ||
