@@ -15,7 +15,7 @@
     "check:database": "node scripts/check-database.mjs",
     "check:restore": "node scripts/check-restore.mjs",
     "check:release-config": "node scripts/check-release-config.mjs",
-    "build:release": "npm run check:release-config && npm run build && npm run check:build",
+    "build:release": "node scripts/build-release.mjs",
     "check:deployment": "node scripts/check-deployment.mjs",
     "prepare:release": "npm run verify && npm run check:release-config && node scripts/prepare-release.mjs"
   },
