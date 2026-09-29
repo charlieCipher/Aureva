@@ -2,7 +2,10 @@ import { supabase } from "../../supabase";
 
 export const assetRepository = {
   async list() {
-    return supabase.from("assets").select("*").order("created_at", { ascending: false });
+    return supabase
+      .from("assets")
+      .select("*")
+      .order("created_at", { ascending: false });
   },
 
   async create(asset) {
@@ -19,5 +22,9 @@ export const assetRepository = {
 
   async uploadEncryptedFile(filePath, encryptedBlob) {
     return supabase.storage.from("vault").upload(filePath, encryptedBlob);
+  },
+
+  async removeFile(filePath) {
+    return supabase.storage.from("vault").remove([filePath]);
   },
 };

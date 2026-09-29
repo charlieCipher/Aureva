@@ -1,0 +1,25 @@
+import { afterEach, expect, it, vi } from 'vitest';
+import { act, cleanup, render, screen } from '@testing-library/react';
+const auth=vi.hoisted(()=>({configured:true,session:vi.fn(),subscribe:vi.fn(),updatePassword:vi.fn()}));
+vi.mock('../src/lib/providers',()=>({AuthProvider:auth}));
+vi.mock('../src/app/Trust',()=>({default:()=>null,publicTrustPaths:[]}));
+vi.mock('../src/Auth',()=>({default:()=> <div>Sign in screen</div>}));
+vi.mock('../src/features/auth/MfaGate',()=>({default:({children})=>children}));
+vi.mock('../src/features/vault/VaultGate',()=>({default:({children})=>children}));
+vi.mock('../src/app/Workspace',()=>({default:()=> <div>Authenticated workspace</div>}));
+import App from '../src/App';
+afterEach(()=>{cleanup();vi.clearAllMocks();});
+it('preserves a newer auth event when the initial session lookup fails',async()=>{
+  let rejectLookup,listener;
+  const unsubscribe=vi.fn();
+  auth.session.mockImplementation(()=>new Promise((_resolve,reject)=>rejectLookup=reject));
+  auth.subscribe.mockImplementation(fn=>{listener=fn;return unsubscribe;});
+  const view=render(<App/>);
+  await act(async()=>listener('SIGNED_IN',{user:{id:'owner'}}));
+  expect(screen.getByText('Authenticated workspace')).toBeTruthy();
+  await act(async()=>rejectLookup(new Error('Late lookup failure')));
+  expect(screen.getByText('Authenticated workspace')).toBeTruthy();
+  expect(screen.queryByText('Sign in screen')).toBeNull();
+  view.unmount();
+  expect(unsubscribe).toHaveBeenCalledTimes(1);
+});

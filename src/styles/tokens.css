@@ -1,0 +1,21 @@
+:root {
+  --bg-primary: #091522;
+  --bg-deep: #070c13;
+  --surface: #171a1f;
+  --surface-elevated: #202630;
+  --brand: #56306b;
+  --brand-hover: #70418a;
+  --text-primary: #f2ece1;
+  --text-secondary: #a9a29a;
+  --luxury: #b69a63;
+  --success: #587868;
+  --warning: #a77c48;
+  --danger: #8b444d;
+  --bg: var(--bg-primary);
+  --panel: var(--surface);
+  --border: #30343c;
+  --muted: var(--text-secondary);
+  --accent: #c6acd5;
+  --purple: var(--brand);
+  --green: #b2ccbf;
+}

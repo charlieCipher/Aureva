@@ -1,0 +1,13 @@
+.git
+.openai
+.env
+.env.*
+node_modules
+dist
+.dist
+.local-release
+.local-backend-validation
+docs
+tests
+supabase
+*.log

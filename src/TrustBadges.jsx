@@ -1,4 +1,3 @@
-/* eslint-disable */
 function TrustBadges() {
   const badges = [
     {

@@ -1,0 +1,157 @@
+/* Reference-led composition: panoramic headers, editorial type, compact panels.
+   Scenery is confined to authentication and headers, never operational tables. */
+.leqvor { --sidebar-width: clamp(220px, 16.8vw, 282px); }
+.leqvor .sidebar { width: var(--sidebar-width); padding: 30px 20px 22px; }
+.leqvor .workspace { margin-left: var(--sidebar-width); width: calc(100% - var(--sidebar-width)); }
+.leqvor .workspace-content { max-width: none; padding: 0 22px; }
+.leqvor .topbar { height: 84px; padding: 0 28px; gap: 25px; background: var(--bg-primary); }
+.leqvor .leqvor-brand > span { font-family: Georgia, serif; font-size: clamp(29px, 2.25vw, 40px); letter-spacing: 7px; }
+.leqvor .leqvor-brand small { font-size: 14px; letter-spacing: 1px; margin-top: 5px; }
+.leqvor .brand-motto { font-size: 8px; letter-spacing: 2px; gap: 11px; margin: 23px 0 32px; }
+.leqvor .nav-caption { display: none; }
+.leqvor .sidebar nav { gap: 7px; }
+.leqvor .sidebar nav button { min-height: 52px; font-size: 16px; gap: 19px; padding: 11px 20px; border-radius: 7px; }
+.leqvor .sidebar nav button svg { width: 23px; height: 23px; }
+.leqvor .sidebar nav button.active { background: var(--brand); border-color: #9065a6; }
+.leqvor .sidebar nav small { display: none; }
+.leqvor .sidebar-bottom { padding-top: 30px; }
+.leqvor .preserve-note { font-family: 'Segoe UI', sans-serif; font-size: 10px; letter-spacing: 4px; line-height: 1.9; margin: 0 20px 35px; }
+.leqvor .preserve-note > span { width: 42px; margin-bottom: 25px; }
+.leqvor .sidebar-bottom > button { font-size: 14px; }
+.global-search { display: flex; align-items: center; gap: 14px; border: 1px solid #414756; background: #202630a6; border-radius: 6px; width: min(520px, 45%); padding: 0 12px; }
+.global-search > svg { color: #b8aa96; flex-shrink: 0; }
+.global-search input { background: transparent; border: 0; font-size: 14px; width: 100%; min-width: 0; min-height: 44px; padding: 8px 0; }
+.global-search input::placeholder { color: var(--text-secondary); }
+.global-search button { border: 0; background: transparent; color: var(--text-secondary); min-width: 32px; min-height: 44px; }
+.topbar-tools { margin-left: auto; gap: 19px; }
+.leqvor .profile-button { gap: 12px; }
+.leqvor .profile-button .avatar { width: 47px; height: 47px; font-size: 22px; background: #151322; border-color: #9c76b2; }
+.profile-button > span:nth-child(2) { font-family: Georgia, serif; font-size: 17px; }
+.profile-button small { font-family: 'Segoe UI', sans-serif; font-size: 10px; margin-top: 3px; }
+.session-label { display: none; }
+.brand-values { border-left: 1px solid #8f7c58; padding: 3px 14px 3px 26px; font-size: 8px; letter-spacing: 3px; line-height: 1.8; }
+.brand-values i { display: block; width: 20px; height: 1px; margin-top: 7px; }
+.demo-strip { min-height: 27px; padding: 4px 0; font-size: 10px; opacity: .88; border-bottom: 0; }
+.demo-strip > span { font-size: 8px; }
+.welcome-banner { position: relative; min-height: 151px; margin: 0 -7px 17px; padding: 13px 16px 21px; border: 0; background: linear-gradient(90deg,#091522 10%,#091522dd 34%,#0915222e 75%,#091522bb),url('/leqvor-panorama.png') center 52%/cover; }
+.welcome-banner h1 { font-family: Georgia, serif; font-size: clamp(35px, 3.05vw, 51px); letter-spacing: -.8px; margin-bottom: 8px; }
+.welcome-banner .welcome-subtitle { font-family: Georgia, serif; font-size: clamp(19px,1.55vw,26px); line-height: 1.3; margin-bottom: 8px; color: var(--text-primary); }
+.welcome-banner .welcome-caption { font-size: 14px; color: #b7b6bd; margin: 0; }
+.welcome-aside { font-family: 'Segoe UI',sans-serif; font-size: 11px; font-style: normal; text-align: left; letter-spacing: 3px; line-height: 1.5; margin: 0 18px 0 0; }
+.welcome-aside i { display: block; width: 25px; height: 1px; margin-top: 13px; }
+.leqvor .panel { border-color: #39404b; border-radius: 10px; }
+.leqvor h2 { font-family: Georgia,serif; font-size: 23px; font-weight: 400; }
+.overview-top { grid-template-columns: .96fr 1.16fr; gap: 12px; }
+.overview-top > .panel { min-height: 183px; padding: 21px 22px 18px; }
+.health-card .panel-heading { margin-bottom: 15px; }
+.health-card .shield-emblem { width: 82px; height: 77px; background: none; border-radius: 0; color: #b9a0d2; }
+.health-card .panel-heading h2 { font-size: 25px; }
+.health-card .panel-heading p { font-size: 12px; }
+.health-card .badge { margin-left: auto; font-size: 9px; letter-spacing: 1px; text-transform: uppercase; border-radius: 20px; }
+.health-metrics { margin-top: 0; padding-top: 15px; }
+.health-metrics > div { font-size: 11px; gap: 10px; }
+.health-metrics strong { font-size: 11px; }
+.readiness { background: var(--surface-elevated); }
+.readiness h2 { font-size: 24px; }
+.readiness .panel-heading { margin-bottom: 2px; }
+.readiness-score { margin-bottom: 12px; justify-content: space-between; }
+.readiness-score > strong { font-size: 55px; line-height: 1; }
+.readiness-score small { font-size: 39px; }
+.readiness-score > span { font-size: 11px; }
+.readiness > p { font-size: 12px; margin-top: 12px; }
+.progress-track { height: 10px; }
+.overview-actions-row { display: grid; grid-template-columns: 2.35fr 1fr; gap: 12px; margin: 12px 0; }
+.quick-actions-panel { padding: 15px!important; }
+.quick-actions-panel .section-label { margin: 0 0 13px; gap: 17px; }
+.quick-actions-panel .section-label h2 { font-size: 23px; }
+.quick-actions-panel .section-label span { font-size: 11px; }
+.quick-actions-panel .quick-actions { grid-template-columns: repeat(4,minmax(0,1fr)); gap: 9px; margin: 0; }
+.quick-actions-panel .quick-actions > button { min-height: 86px; padding: 12px 10px; gap: 10px; background: #202630; border-color: #3a404c; }
+.quick-actions-panel .quick-actions strong { font-family: Georgia,serif; font-size: 13px; line-height: 1.35; }
+.quick-actions-panel .quick-actions small { font-size: 10px; line-height: 1.4; }
+.quick-actions-panel .icon-tile { width: 42px; height: 48px; border-color: #665079; background: #332640; }
+.quick-actions-panel .quick-actions > button > svg:last-child { width: 12px; }
+.legacy-quote { padding: 18px 25px!important; background: var(--surface-elevated); }
+.legacy-quote blockquote { font-family: Georgia,serif; font-size: clamp(19px,1.7vw,27px); font-style: italic; line-height: 1.35; margin: 0 0 12px; color: var(--text-primary); }
+.legacy-quote > span { font-family: Georgia,serif; font-size: 10px; letter-spacing: 5px; color: #b8b0a2; }
+.legacy-quote > i { display: inline-block; width: 25px; height: 1px; margin-left: 20px; vertical-align: middle; }
+.overview-bottom { grid-template-columns: 1.32fr .95fr 1.02fr; gap: 12px; }
+.overview-bottom > .panel { padding: 18px 19px; }
+.overview-bottom .panel-heading { margin-bottom: 7px; }
+.overview-bottom .count-label { font-size: 9px; text-align: center; border-left: 1px solid #5d5548; padding-left: 13px; }
+.overview-bottom .count-label strong { display: block; font-family: Georgia,serif; font-size: 28px; color: var(--text-primary); font-weight: 400; }
+.asset-summary-intro { font-size: 11px; color: var(--text-secondary); margin: -4px 0 17px; }
+.asset-summary { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 9px; }
+.asset-summary button { background: #202630; padding: 10px 8px; min-height: 75px; gap: 8px; }
+.asset-summary button > svg:first-child { width: 20px; height: 25px; }
+.asset-summary button > svg:last-child { width: 10px; }
+.asset-summary button span { font-family: Georgia,serif; font-size: 12px; }
+.asset-summary button small { font-family: 'Segoe UI',sans-serif; font-size: 10px; }
+.activity-list { display: grid; gap: 5px; margin-top: 16px; }
+.activity-record-icon { display: grid; place-items: center; width: 32px; height: 36px; flex-shrink: 0; color: #baa0cb; border: 1px solid #51425e; border-radius: 5px; background: #211b2a; }
+.activity-list button { background: #202630; border: 1px solid #303946; padding: 10px; border-radius: 5px; gap: 9px; }
+.activity-list button:last-child { border-bottom: 1px solid #303946; }
+.activity-list strong { font-size: 11px; }
+.activity-list small { font-size: 10px; margin-top: 2px; }
+.activity-list time { font-size: 9px; white-space: normal; text-align: right; max-width: 56px; }
+.insights-heading { display: flex; gap: 12px; align-items: flex-start; }
+.insights-heading > svg { flex-shrink: 0; }
+.next-action .insights-heading h2 { font-size: 20px; margin-bottom: 5px; }
+.next-action .insights-heading p { font-size: 10px; color: var(--text-secondary); margin: 0; }
+.insights-body { display: flex; align-items: center; gap: 16px; border: 1px solid #36404c; background: #202630; border-radius: 7px; padding: 12px; margin: 17px 0 10px; }
+.insights-body .progress-ring { width: 95px; height: 95px; margin: 0; padding: 7px; flex-shrink: 0; }
+.insights-body .progress-ring > span { font-size: 29px; }
+.insights-body .progress-ring small { font-size: 20px; }
+.insights-body ul { margin: 0; padding: 0; list-style: none; }
+.insights-body li { display: flex; align-items: flex-start; gap: 7px; font-size: 10px; color: #c2c0be; margin: 10px 0; line-height: 1.4; }
+.insights-body li svg { flex-shrink: 0; color: #b6cdbc; }
+.next-action .primary { width: 100%; font-size: 13px; min-height: 44px; }
+.next-action > small { font-size: 10px; margin-top: 8px; text-align: center; }
+.leqvor .workspace-footer { margin-top: 18px; padding: 18px 0; }
+.page-heading { min-height: 151px; padding: 25px 14px; margin: 0 -7px 20px; background: linear-gradient(90deg,#091522 12%,#091522e8 45%,#09152260),url('/leqvor-panorama.png') center 50%/cover; }
+.page-heading h1 { font-family: Georgia,serif; font-size: clamp(35px,3vw,50px); }
+.page-heading .eyebrow { font-size: 9px; color: #c3b08d; margin-bottom: 9px; }
+.page-heading .muted { font-size: 14px; }
+.people-actions { gap: 9px; }
+.people-actions .secondary { background: var(--surface-elevated); }
+.plan-sections { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+.plan-sections > button { align-items: flex-start; padding: 17px 15px; flex-wrap: wrap; }
+.plan-sections > button > div { flex: 1; min-width: 115px; }
+.plan-sections > button > svg:last-child { display: none; }
+.plan-sections h2 { font-size: 20px; }
+.plan-sections p { font-size: 12px; }
+.plan-sections .icon-tile { width: 43px; height: 48px; }
+.security-main { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); align-content: start; gap: 12px; }
+.security-main > .security-section:last-child { grid-column: 1/-1; }
+.security-section { padding: 18px; }
+.security-section h2 { font-family: Georgia,serif; font-size: 22px; }
+.security-section .setting-row { flex-wrap: wrap; gap: 10px; }
+.security-section .setting-row small { font-size: 11px; }
+.security-section .setting-row > span:first-child { min-width: 150px; flex: 1; }
+.auth-page { background: linear-gradient(90deg,#070c1320,#070c1310),url('/leqvor-family.png') center/cover; grid-template-columns: 1.35fr 1fr; }
+.auth-story { background: transparent; border: 0; padding: 35px 55px; }
+.auth-entry { background: transparent; padding: 40px; }
+.auth-form-wrap { background: #0d1727f5; border: 1px solid #785587; border-radius: 16px; padding: 38px 42px; max-width: 530px; }
+.auth-form-wrap > .icon-tile { display: none; }
+.auth-form-wrap h2 { text-align: center; font-family: Georgia,serif; font-size: 33px; }
+.auth-form-wrap > .eyebrow,.auth-form-wrap > .muted { text-align: center; }
+.auth-story-copy { top: 16%; padding: 0; }
+.auth-story h1 { font-size: clamp(48px,4.5vw,75px); line-height: 1.03; letter-spacing: -1px; }
+.auth-story-copy > p:not(.eyebrow) { font-family: Georgia,serif; font-size: 20px; }
+.auth-form-wrap .notice { font-size: 11px; }
+.auth-form-wrap .auth-divider { margin: 16px 0; }
+.auth-form-wrap .stack-form { gap: 16px; }
+.auth-form-wrap .auth-note { font-size: 10px; margin-top: 15px; padding-top: 15px; }
+.continuity-gaps { margin-top: 20px; }
+.gap-records { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 15px; }
+.gap-record { padding: 16px; background: var(--surface-elevated); border-radius: 7px; }
+.gap-record > div { display: flex; justify-content: space-between; gap: 12px; }
+.gap-record > div .muted { font-size: 12px; }
+.gap-record ul { list-style: none; padding: 0; }
+.gap-record li,.freshness-note { display: flex; gap: 9px; align-items: center; font-size: 13px; color: var(--text-secondary); margin: 8px 0; }
+.freshness-note { margin-top: 20px; }
+@media(min-width:1600px){.leqvor .workspace-content{padding:0 22px!important}.quick-actions-panel .quick-actions strong{font-size:14px}.quick-actions-panel .quick-actions small{font-size:11px}.asset-summary button span{font-size:14px}.asset-summary button small{font-size:11px}.activity-list strong{font-size:12px}.insights-body li{font-size:11px}.overview-bottom>.panel{min-height:266px}}
+@media(max-width:1350px){.brand-values{display:none}.quick-actions-panel .quick-actions{grid-template-columns:repeat(2,minmax(0,1fr))}.quick-actions-panel .quick-actions>button{min-height:70px}.legacy-quote{display:flex;flex-direction:column;justify-content:center}.overview-bottom{grid-template-columns:1.12fr 1fr}.next-action{grid-column:1/-1;display:grid;grid-template-columns:1fr 1.4fr;gap:5px 22px;align-items:center}.next-action .insights-body{grid-column:2;grid-row:1/4;margin:0}.next-action .primary{max-width:320px}.next-action>small{text-align:left}.asset-summary{grid-template-columns:repeat(3,minmax(0,1fr))}.overview-top{grid-template-columns:1fr 1fr}.health-card .shield-emblem{width:48px}.health-card .shield-emblem svg{width:40px}.health-card .panel-heading{flex-wrap:wrap}.health-card .badge{margin-left:0}.readiness-score>strong{font-size:48px}.continuity-layout{grid-template-columns:165px minmax(0,1fr) 230px;gap:15px}.plan-sections{grid-template-columns:1fr}.plan-sidebar{grid-column:auto;display:flex}.plan-sidebar>.panel:first-child{grid-row:auto}.security-main{grid-template-columns:1fr}.security-main>.security-section:last-child{grid-column:auto}.page-heading h1{font-size:38px}}
+@media(max-width:1000px){.leqvor .sidebar{padding:28px 14px}.leqvor .brand-motto{gap:7px;font-size:7px}.leqvor .sidebar nav button{padding:10px 13px;font-size:15px}.leqvor .workspace-content{padding:0 17px}.leqvor .topbar{padding:0 20px;gap:14px}.global-search{width:62%}.profile-button>span:nth-child(2){display:none}.overview-top{grid-template-columns:1fr}.overview-top>.panel{min-height:0}.health-card .panel-heading{flex-wrap:nowrap}.health-card .badge{margin-left:auto}.overview-actions-row{grid-template-columns:1fr}.legacy-quote{display:none}.quick-actions-panel .quick-actions{grid-template-columns:repeat(2,minmax(0,1fr))}.overview-bottom{grid-template-columns:1fr}.next-action{grid-column:auto;display:block}.next-action .insights-body{margin:17px 0}.next-action .primary{max-width:none}.next-action>small{text-align:center}.continuity-layout{grid-template-columns:155px minmax(0,1fr)}.plan-sidebar{grid-column:2;display:grid;grid-template-columns:1fr 1fr}.security-layout{grid-template-columns:1fr}.security-aside{display:grid;grid-template-columns:1fr 1fr}.auth-page{grid-template-columns:1fr 1fr}.auth-story{padding:30px}.auth-story-copy{left:30px;right:20px}.auth-story h1{font-size:48px}.auth-entry{padding:25px 20px}.auth-form-wrap{padding:28px 24px}}
+@media(max-width:850px){.leqvor .sidebar{display:none}.leqvor .workspace{margin-left:0;width:100%}.leqvor .topbar{height:70px}.leqvor .profile-button .avatar{width:36px;height:36px;font-size:18px}.topbar-tools{gap:5px}.global-search{width:75%;gap:8px}.global-search input{font-size:12px}.welcome-banner h1{font-size:36px}.welcome-banner .welcome-subtitle{font-size:21px}.welcome-aside{display:none}.auth-page{grid-template-columns:1fr;background:none}.auth-story{background:linear-gradient(180deg,#070c1300,#070c1340),url('/leqvor-family.png') center 50%/cover;min-height:360px;height:360px;padding:24px}.auth-story-copy{top:125px;left:25px}.auth-story h1{font-size:45px}.auth-entry{padding:20px;background:var(--bg-primary)}.auth-form-wrap{max-width:530px;padding:28px}.view-switch button,.setting-row .secondary{min-height:44px}}
+@media(max-width:600px){.leqvor .workspace-content{padding:0 14px}.leqvor .topbar{padding:0 14px;gap:8px}.global-search{width:calc(100% - 95px);padding:0 10px}.global-search>svg{width:16px}.global-search button{display:none}.demo-strip{min-height:32px;font-size:9px}.demo-strip a{margin-left:auto}.welcome-banner{margin-bottom:12px;min-height:160px;padding:23px 7px}.welcome-banner h1{font-size:33px}.welcome-banner .welcome-subtitle{font-size:19px;max-width:300px}.welcome-banner .welcome-caption{font-size:12px}.overview-top>.panel{padding:17px}.health-card .panel-heading h2{font-size:23px}.health-card .panel-heading{flex-wrap:wrap}.health-card .badge{margin-left:auto}.health-card .shield-emblem{width:45px;height:50px}.health-card .panel-heading p{font-size:11px}.health-metrics>div{font-size:10px}.health-metrics strong{font-size:10px}.quick-actions-panel{padding:14px!important}.quick-actions-panel .section-label{flex-wrap:wrap;gap:4px}.quick-actions-panel .quick-actions>button{padding:12px 8px;gap:9px;min-height:85px}.quick-actions-panel .icon-tile{width:33px;height:40px}.quick-actions-panel .quick-actions strong{font-size:12px}.quick-actions-panel .quick-actions small{font-size:10px}.asset-summary{grid-template-columns:repeat(2,minmax(0,1fr))}.asset-summary button span{font-size:14px}.asset-summary button small{font-size:11px}.activity-list strong{font-size:12px}.activity-list small{font-size:11px}.insights-body li{font-size:11px}.page-heading{padding:24px 7px;min-height:180px;margin-bottom:20px}.page-heading h1{font-size:33px}.page-heading .muted{font-size:13px}.continuity-layout{grid-template-columns:1fr}.plan-sidebar{grid-column:auto;display:flex}.security-aside{display:flex}.gap-records{grid-template-columns:1fr}.continuity-gaps .panel-heading{flex-wrap:wrap}.auth-form-wrap{padding:25px 22px}.auth-story-copy{padding:0}.auth-form-wrap h2{font-size:30px}.auth-form-wrap .notice{font-size:12px}}

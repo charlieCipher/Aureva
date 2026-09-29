@@ -1,7 +1,7 @@
 /* eslint-disable */
 import { useEffect, useState } from "react";
-import CryptoJS from "crypto-js";
 import { supabase } from "./supabase";
+import { decryptAsset, encryptAsset } from "./modules/security/crypto";
 
 function Upload({ session }) {
   const [file, setFile] = useState(null);
@@ -37,8 +37,8 @@ function Upload({ session }) {
     try {
       const reader = new FileReader();
       reader.onload = async (e) => {
-        const encrypted = CryptoJS.AES.encrypt(e.target.result, encryptionKey).toString();
-        const encryptedBlob = new Blob([encrypted], { type: "text/plain" });
+        const encrypted = await encryptAsset({ name: file.name, type: file.type, data: e.target.result }, encryptionKey);
+        const encryptedBlob = new Blob([JSON.stringify(encrypted)], { type: "application/json" });
         const cleanName = file.name.replace(/[^a-zA-Z0-9.]/g, "_");
         const filePath = `${userId}/${Date.now()}_${cleanName}.enc`;
         const { error } = await supabase.storage.from("vault").upload(filePath, encryptedBlob);
@@ -78,14 +78,12 @@ function Upload({ session }) {
     }
 
     const response = await fetch(signedData.signedUrl);
-    const encryptedText = await response.text();
+    const encryptedPayload = await response.json();
 
     try {
-      const decrypted = CryptoJS.AES.decrypt(encryptedText, decryptKey);
-      const decryptedData = decrypted.toString(CryptoJS.enc.Utf8);
-      if (!decryptedData) return setMessage("Wrong decryption key.");
-      setDecryptedContent(decryptedData);
-      setDecryptedFileName(fileName.replace(".enc", ""));
+      const decrypted = await decryptAsset(encryptedPayload, decryptKey);
+      setDecryptedContent(decrypted.data);
+      setDecryptedFileName(decrypted.name || fileName.replace(".enc", ""));
       setMessage("File decrypted successfully.");
     } catch (err) {
       setMessage("Decryption failed: " + err.message);

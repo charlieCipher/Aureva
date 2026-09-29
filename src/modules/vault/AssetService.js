@@ -10,7 +10,10 @@ export const assetService = {
   async createAsset(asset) {
     const result = await assetRepository.create(asset);
     if (!result.error && result.data?.[0]) {
-      eventBus.emit(ASSET_EVENTS.CREATED, { assetId: result.data[0].id, type: result.data[0].type });
+      eventBus.emit(ASSET_EVENTS.CREATED, {
+        assetId: result.data[0].id,
+        type: result.data[0].category || result.data[0].type,
+      });
     }
     return result;
   },
@@ -18,7 +21,10 @@ export const assetService = {
   async updateAsset(id, updates) {
     const result = await assetRepository.update(id, updates);
     if (!result.error && result.data?.[0]) {
-      eventBus.emit(ASSET_EVENTS.UPDATED, { assetId: id, type: result.data[0].type });
+      eventBus.emit(ASSET_EVENTS.UPDATED, {
+        assetId: id,
+        type: result.data[0].category || result.data[0].type,
+      });
     }
     return result;
   },

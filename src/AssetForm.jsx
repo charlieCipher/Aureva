@@ -1,232 +1,198 @@
-/* eslint-disable */
-import { useEffect, useState } from "react";
-import CryptoJS from "crypto-js";
+import { useRef, useState } from "react";
 import { assetService } from "./modules/vault/AssetService";
-
-function AssetForm({
-  session,
-  onAssetAdded,
-  initialType = "",
-  categoryOptions = ["Personal", "Bank", "Investment", "Legal", "Property", "Insurance", "Loan", "Other"],
-}) {
-  const [title, setTitle] = useState("");
-  const [type, setType] = useState("");
-  const [description, setDescription] = useState("");
-  const [instructions, setInstructions] = useState("");
-  const [file, setFile] = useState(null);
-  const [encryptionKey, setEncryptionKey] = useState("");
-  const [message, setMessage] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    setType(initialType || "");
-  }, [initialType]);
-
-  const inputStyle = {
-    display: "block",
-    width: "100%",
-    marginBottom: 12,
-    padding: "13px 15px",
-    background: "#FFFFFF",
-    border: "1px solid #ECECF2",
-    borderRadius: 16,
-    color: "#111827",
-    fontSize: 14,
-    boxSizing: "border-box",
-  };
-
-  async function uploadFile() {
-    if (!file) return null;
-    if (!encryptionKey) {
-      setMessage("Please enter an encryption key to attach a file.");
-      return null;
-    }
-
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-        const encrypted = CryptoJS.AES.encrypt(e.target.result, encryptionKey).toString();
-        const encryptedBlob = new Blob([encrypted], { type: "text/plain" });
-        const cleanName = file.name.replace(/[^a-zA-Z0-9.]/g, "_");
-        const filePath = `${session.user.id}/${Date.now()}_${cleanName}.enc`;
-        const { error } = await assetService.uploadEncryptedFile(filePath, encryptedBlob);
-
-        if (error) {
-          setMessage("File upload failed: " + error.message);
-          resolve(null);
-        } else {
-          resolve(filePath);
-        }
-      };
-      reader.readAsDataURL(file);
-    });
-  }
-
-  async function handleSubmit() {
-    if (!title) return setMessage("Please enter a title.");
-    const selectedType = type || initialType || "Other";
-
-    setLoading(true);
-    setMessage("");
-
+import { assetRepository } from "./modules/vault/AssetRepository";
+import { encryptAsset, generateIntegrityHash } from "./modules/security/crypto";
+import { encryptedFile } from "./shared/utils/files";
+import { errorMessage } from "./shared/utils/errors";
+import Icon from "./components/Icon";
+const CATEGORIES = [
+  "Personal",
+  "Financial",
+  "Legal",
+  "Medical",
+  "Property",
+  "Other",
+];
+export default function AssetForm({ session, onAssetAdded, onCancel }) {
+  const [notice, setNotice] = useState("");
+  const [busy, setBusy] = useState(false);
+  const submitting = useRef(false);
+  async function submit(event) {
+    event.preventDefault();
+    if (submitting.current) return;
+    const data = new FormData(event.currentTarget);
+    const secret = data.get("secret");
+    if (secret !== data.get("confirm"))
+      return setNotice(
+        "The vault secrets don’t match. Please check both fields.",
+      );
+    if (!data.get("title").trim())
+      return setNotice("Give this record a title.");
+    submitting.current = true;
+    setBusy(true);
+    setNotice("");
     let filePath = null;
-    if (file) {
-      filePath = await uploadFile();
-      if (!filePath) {
-        setLoading(false);
-        return;
+    let saved = false;
+    try {
+      const file = data.get("attachment");
+      if (file?.size) {
+        const blob = await encryptedFile(file, secret);
+        filePath = `${session.user.id}/${crypto.randomUUID()}.enc`;
+        const upload = await assetService.uploadEncryptedFile(filePath, blob);
+        if (upload.error) {
+          filePath = null;
+          throw upload.error;
+        }
       }
+      const encrypted_payload = await encryptAsset(
+        {
+          description: data.get("description"),
+          instructions: data.get("instructions"),
+          file_name: file?.size ? file.name : null,
+        },
+        secret,
+      );
+      const integrity_hash = await generateIntegrityHash(encrypted_payload);
+      const result = await assetService.createAsset({
+        user_id: session.user.id,
+        title: data.get("title").trim(),
+        category: data.get("category"),
+        encrypted_payload,
+        integrity_hash,
+        encryption_version: "aureva-v4-aes-gcm",
+        file_path: filePath,
+      });
+      if (result.error) throw result.error;
+      saved = true;
+      onAssetAdded(result.data[0]);
+    } catch (error) {
+      let message = errorMessage(error);
+      if (filePath && !saved) {
+        try {
+          const cleanup = await assetRepository.removeFile(filePath);
+          if (cleanup.error)
+            message +=
+              " An encrypted attachment remains in storage; contact support to remove it.";
+        } catch {
+          message += " The uploaded encrypted attachment could not be removed.";
+        }
+      }
+      setNotice(message);
+    } finally {
+      submitting.current = false;
+      setBusy(false);
     }
-
-    const { data, error } = await assetService.createAsset({
-      user_id: session.user.id,
-      title,
-      type: selectedType,
-      description,
-      instructions,
-      file_path: filePath,
-    });
-
-    if (error) {
-      setMessage("Failed to save: " + error.message);
-    } else {
-      setMessage("Continuity record saved.");
-      setTitle("");
-      setType(initialType || "");
-      setDescription("");
-      setInstructions("");
-      setFile(null);
-      setEncryptionKey("");
-      if (onAssetAdded) onAssetAdded(data[0]);
-    }
-
-    setLoading(false);
   }
-
   return (
-    <section
-      style={{
-        background: "#FFFFFF",
-        border: "1px solid #ECECF2",
-        borderRadius: 24,
-        boxShadow: "0 24px 60px rgba(17,24,39,0.08)",
-        padding: 28,
-        marginBottom: 24,
-      }}
-    >
-      <div style={{ display: "flex", justifyContent: "space-between", gap: 20, marginBottom: 18 }}>
+    <form className="stack-form" onSubmit={submit}>
+      <div className="form-heading">
+        <span className="icon-tile">
+          <Icon name="vault" />
+        </span>
         <div>
-          <p style={{ margin: "0 0 8px 0", color: "#6D5EF5", fontSize: 12, fontWeight: 900, letterSpacing: 1 }}>
-            NEW RECORD
+          <h2>Add a record</h2>
+          <p className="muted">
+            Start with one important detail. You can build from here.
           </p>
-          <h2 style={{ margin: 0, color: "#111827", fontSize: 28 }}>Add Continuity Record</h2>
-        </div>
-        <p style={{ margin: 0, color: "#6B7280", fontSize: 13, maxWidth: 320, lineHeight: 1.5 }}>
-          Capture what exists, where it is, and what your trusted family should do.
-        </p>
-      </div>
-
-      <input
-        type="text"
-        placeholder="Record title, e.g. HDFC Bank Account"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        autoComplete="off"
-        name="asset-title"
-        style={inputStyle}
-      />
-
-      <div style={{ marginBottom: 12 }}>
-        <p style={{ margin: "0 0 8px 0", color: "#6B7280", fontSize: 12, fontWeight: 800 }}>
-          OPTIONAL SECTION
-        </p>
-        <p style={{ margin: "0 0 10px 0", color: "#6B7280", fontSize: 12, lineHeight: 1.45 }}>
-          Choose only if this record belongs to a specific section. If you skip this, it stays under Other.
-        </p>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(112px, 1fr))", gap: 10 }}>
-          {categoryOptions.map((option) => (
-            <button
-              key={option}
-              type="button"
-              onClick={() => setType(option)}
-              style={{
-                minHeight: 46,
-                borderRadius: 14,
-                border: type === option ? "1px solid #6D5EF5" : "1px solid #ECECF2",
-                background: type === option ? "#F0EDFF" : "#FFFFFF",
-                color: type === option ? "#6D5EF5" : "#111827",
-                fontWeight: 850,
-              }}
-            >
-              {option}
-            </button>
-          ))}
         </div>
       </div>
-
-      <textarea
-        placeholder="Description, account hint, document location, or branch details"
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-        rows={2}
-        style={{ ...inputStyle, resize: "vertical" }}
-      />
-      <textarea
-        placeholder="Continuity instructions. Example: Tell your family where to find this record and who to contact."
-        value={instructions}
-        onChange={(e) => setInstructions(e.target.value)}
-        rows={4}
-        style={{ ...inputStyle, resize: "vertical", borderColor: "rgba(109,94,245,0.45)" }}
-      />
-
-      <div style={{ background: "#F4F2FF", borderRadius: 18, padding: 16, marginBottom: 14 }}>
-        <p style={{ margin: "0 0 10px 0", color: "#5f6b59", fontSize: 13, fontWeight: 800 }}>
-          Optional encrypted supporting file
-        </p>
-        <input type="file" onChange={(e) => setFile(e.target.files[0])} style={{ ...inputStyle, cursor: "pointer" }} />
-        {file && (
+      <div className="form-pair">
+        <label>
+          Record title
           <input
-            type="password"
-            placeholder="Private encryption key for this file"
-            value={encryptionKey}
-            onChange={(e) => setEncryptionKey(e.target.value)}
-            style={inputStyle}
+            name="title"
+            autoFocus
+            required
+            maxLength={160}
+            placeholder="e.g. Home insurance"
           />
-        )}
+        </label>
+        <label>
+          Category
+          <select name="category">
+            {CATEGORIES.map((category) => (
+              <option key={category}>{category}</option>
+            ))}
+          </select>
+        </label>
       </div>
-
-      <button
-        onClick={handleSubmit}
-        disabled={loading}
-        style={{
-          width: "100%",
-          padding: "14px",
-          background: "#111827",
-          color: "#FFFFFF",
-          border: "1px solid #111827",
-          cursor: loading ? "not-allowed" : "pointer",
-          borderRadius: 999,
-          fontSize: 15,
-          fontWeight: 850,
-          opacity: loading ? 0.7 : 1,
-        }}
-      >
-        {loading ? "Saving..." : "Add Continuity Record"}
-      </button>
-
-      {message && (
-        <p
-          style={{
-            color: message.includes("saved") ? "#6D5EF5" : "#EF4444",
-            marginTop: 12,
-            fontSize: 14,
-          }}
-        >
-          {message}
+      <p className="field-hint">
+        Titles and categories are visible in your record list. Put private
+        information in the fields below.
+      </p>
+      <label>
+        Private details
+        <textarea
+          name="description"
+          rows={3}
+          placeholder="Where to find it, account details, or who to contact…"
+        />
+      </label>
+      <label>
+        Instructions for the future
+        <textarea
+          name="instructions"
+          rows={3}
+          placeholder="What would you want someone to know?"
+        />
+      </label>
+      <label>
+        Supporting file <span className="muted">· optional, up to 10 MB</span>
+        <input name="attachment" type="file" />
+      </label>
+      <div className="form-section">
+        <h3>
+          <Icon name="lock" /> Protect this record
+        </h3>
+        <p className="muted">
+          Choose a secret you can keep safely. You need this exact secret to
+          unlock the record and its attachment. Account password resets cannot
+          recover it.
         </p>
+        <div className="form-pair">
+          <label>
+            Vault secret
+            <input
+              required
+              name="secret"
+              type="password"
+              minLength={12}
+              autoComplete="new-password"
+              placeholder="At least 12 characters"
+            />
+          </label>
+          <label>
+            Confirm secret
+            <input
+              required
+              name="confirm"
+              type="password"
+              minLength={12}
+              autoComplete="new-password"
+              placeholder="Enter it again"
+            />
+          </label>
+        </div>
+      </div>
+      {notice && (
+        <div role="alert" className="notice">
+          {notice}
+        </div>
       )}
-    </section>
+      <div className="form-actions">
+        <button
+          type="button"
+          className="secondary"
+          onClick={onCancel}
+          disabled={busy}
+        >
+          Cancel
+        </button>
+        <button className="primary" disabled={busy}>
+          <Icon name="lock" />
+          {busy ? "Encrypting and saving…" : "Save encrypted record"}
+        </button>
+      </div>
+    </form>
   );
 }
-
-export default AssetForm;

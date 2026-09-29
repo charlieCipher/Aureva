@@ -1,3 +1,5 @@
+import {sanitizeEvent} from '../security/safeEvents';
+const allowedEvents = new Set(['asset_created','asset_updated','asset_deleted','recovery_verified','recovery_practiced','device_trusted','security_state_changed','export_requested']);
 class EventBus {
   constructor() {
     this.listeners = new Map();
@@ -15,10 +17,12 @@ class EventBus {
   }
 
   emit(eventName, payload = {}) {
+    if (!allowedEvents.has(eventName)) return null;
+    const safe = sanitizeEvent({record_id:payload.assetId,device_id:payload.deviceId,severity:payload.severity});
     const event = {
       id: crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${eventName}`,
       name: eventName,
-      payload,
+      payload: safe,
       createdAt: new Date().toISOString(),
     };
 
@@ -33,4 +37,3 @@ class EventBus {
 }
 
 export const eventBus = new EventBus();
-

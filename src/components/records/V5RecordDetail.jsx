@@ -1,0 +1,279 @@
+import InsuranceFields from './InsuranceFields';
+import { readInsuranceForm } from '../../modules/insurance/continuity';
+import { useState, useEffect, useRef } from "react";
+import { useVault } from "../../features/vault/VaultContext";
+import { safeFailure } from "../../modules/security/safeEvents";
+import { Button, Card } from "../ui/Primitives";
+import Icon from "../Icon";
+import Modal from "../Modal";
+import SecureAction from "../security/SecureAction";
+export default function V5RecordDetail({ record, onChanged, onDeleted, records=[], people=[] }) {
+  const vault = useVault(),
+    [payload, setPayload] = useState(null),
+    [files, setFiles] = useState([]),
+    [busy, setBusy] = useState(false),
+    [error, setError] = useState(""),
+    [editing, setEditing] = useState(false),
+    [deleting, setDeleting] = useState(false),
+    [conflict, setConflict] = useState(false);
+  const active = useRef(true),
+    saving = useRef(false),
+    epoch = useRef(0);
+  function handleFailure(error) {
+    if (!active.current) return;
+    if (error?.code === '40001') {
+      epoch.current++;
+      setPayload(null);
+      setFiles([]);
+      setEditing(false);
+      setDeleting(false);
+      setConflict(true);
+    }
+    setError(safeFailure(error));
+  }
+  useEffect(() => {
+    // Capture the counter object, not its numeric value: cleanup invalidates
+    // every operation started during this mounted lifetime.
+    const operationEpoch = epoch;
+    active.current = true;
+    return () => {
+      active.current = false;
+      operationEpoch.current++;
+    };
+  }, []);
+  useEffect(() => {
+    if (!payload) return;
+    const timer = setTimeout(() => {
+      epoch.current++;
+      setPayload(null);
+      setFiles([]);
+      setEditing(false);
+    }, 30000);
+    return () => clearTimeout(timer);
+  }, [payload]);
+  async function reveal() {
+    const version = ++epoch.current;
+    setBusy(true);
+    setError("");
+    try {
+      const data = await vault.service.reveal(record);
+      const documents = await vault.service.files(record);
+      if (active.current && version === epoch.current) {
+        setPayload(data);
+        setFiles(documents);
+      }
+    } catch (e) {
+      if (active.current) setError(safeFailure(e));
+    } finally {
+      if (active.current) setBusy(false);
+    }
+  }
+  async function download(file) {
+    const version=epoch.current;
+    setBusy(true);
+    setError("");
+    try {
+      const data = await vault.service.download(file);
+      if (!active.current || version!==epoch.current) {
+        data.bytes.fill(0);
+        return;
+      }
+      const blob = new Blob([data.bytes], { type: "application/octet-stream" });
+      data.bytes.fill(0);
+      const url = URL.createObjectURL(blob);
+      vault.controller.trackURL(url);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = data.name || "attachment";
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (e) {
+      if (active.current) setError(safeFailure(e));
+    } finally {
+      if (active.current) setBusy(false);
+    }
+  }
+  async function save(e) {
+    e.preventDefault();
+    if (saving.current || busy || !payload) return;
+    const f = new FormData(e.currentTarget);
+    const title = String(f.get('title') || '').trim();
+    if (!title || title.length > 160) {
+      setError('Enter a title between 1 and 160 characters.');
+      return;
+    }
+    const version = epoch.current;
+    saving.current = true;
+    setBusy(true);
+    setError("");
+    try {
+      const next = { ...payload };
+      for (const field of [
+        "description",
+        "institution",
+        "reference",
+        "original_location",
+        "professional",
+        "trusted_person",
+        "instructions",
+      ])
+        next[field] = f.get(field);
+      if(record.category === "Insurance") next.insurance=readInsuranceForm(f,records,people);
+      await vault.service.update(
+        record,
+        {
+          title,
+          category: record.category,
+          reviewed_at: new Date().toISOString(),
+          file_count: files.length,
+        },
+        next,
+      );
+      if (!active.current || version !== epoch.current) return;
+      setPayload(null);
+      setFiles([]);
+      setEditing(false);
+      onChanged?.();
+    } catch (e) {
+      if (version === epoch.current) handleFailure(e);
+    } finally {
+      saving.current = false;
+      if (active.current) setBusy(false);
+    }
+  }
+  return (
+    <Card>
+      {!payload ? (
+        <div className="locked-content">
+          <span className="lock-medallion">
+            <Icon name="lock" size={30} />
+          </span>
+          <h2>Encrypted Information</h2>
+          <p className="muted">Sensitive information hidden</p>
+          <Button variant="primary" icon="eye" disabled={busy || conflict} onClick={reveal}>
+            {busy ? "Revealing…" : "Reveal securely"}
+          </Button>
+          <p className="field-hint">
+            Active vault session required · hides after 30 seconds
+          </p>
+        </div>
+      ) : editing ? (
+        <form className="stack-form" onSubmit={save}>
+          <h2>Update continuity record</h2>
+          {record.category === "Insurance" && <InsuranceFields value={payload.insurance} records={records} people={people}/>}
+          <label>
+            Title
+            <input name="title" required maxLength={160} defaultValue={record.title} />
+          </label>
+          {[
+            ["description", "Why it matters"],
+            ["institution", "Institution"],
+            ["reference", "Reference"],
+            ["original_location", "Original location"],
+            ["professional", "Professional contact"],
+            ["trusted_person", "Who should know"],
+            ["instructions", "What should happen next"],
+          ].map(([key, label]) => (
+            <label key={key}>
+              {label}
+              <textarea name={key} defaultValue={payload[key] || ""} />
+            </label>
+          ))}
+          <Button variant="primary" disabled={busy}>
+            {busy ? 'Saving encrypted changes…' : 'Save encrypted changes'}
+          </Button>
+          <Button type="button" disabled={busy} onClick={() => { setEditing(false); setError(''); }}>Cancel editing</Button>
+        </form>
+      ) : (
+        <div className="revealed-record">
+          <div className="panel-heading">
+            <h2>Continuity Information</h2>
+            <Button
+              onClick={() => {
+                epoch.current++;
+                setPayload(null);
+                setFiles([]);
+              }}
+            >
+              Hide
+            </Button>
+          </div>
+          {[
+            ["description", "Why it matters"],
+            ["institution", "Institution"],
+            ["reference", "Reference"],
+            ["original_location", "Where is the original?"],
+            ["professional", "Professional contact"],
+            ["trusted_person", "Who should know?"],
+            ["instructions", "What should happen next?"],
+          ].map(([key, label]) => (
+            <div className="private-field" key={key}>
+              <h3>{label}</h3>
+              <p>{payload[key] || "Not added yet"}</p>
+            </div>
+          ))}
+          {record.category === "Insurance" && <div className="insurance-private-details"><h2>Policy details</h2>{[["Policy type",payload.insurance?.policy_type],["Recorded status",payload.insurance?.policy_status],["Renewal date",payload.insurance?.renewal_date],["Claim instructions",payload.insurance?.claim_instructions]].map(([label,value])=><div className="private-field" key={label}><h3>{label}</h3><p>{value||"Not recorded"}</p></div>)}</div>}
+          <div className="form-actions">
+            <Button disabled={busy} onClick={() => setEditing(true)}>
+              Edit record
+            </Button>
+            <Button
+              disabled={busy}
+              onClick={async () => {
+                setBusy(true);setError('');
+                try { await vault.service.update(
+                  record,
+                  {
+                    title: record.title,
+                    category: record.category,
+                    reviewed_at: new Date().toISOString(),
+                    file_count: files.length,
+                  },
+                  payload,
+                );
+                onChanged?.();
+                }catch(error){handleFailure(error);}finally{setBusy(false);}
+              }}
+            >
+              Confirm still current
+            </Button>
+            <Button onClick={() => setDeleting(true)}>Delete record</Button>
+          </div>
+          {files.map((file, i) => (
+            <Button
+              key={file.id}
+              disabled={busy}
+              onClick={() => download(file)}
+              icon="download"
+            >
+              Download document {i + 1}
+            </Button>
+          ))}
+        </div>
+      )}
+      {error && (
+        <p role="alert" className="notice">
+          {error}
+        </p>
+      )}
+      {conflict && <Button onClick={() => onChanged?.()}>Reload latest record</Button>}
+      {deleting && (
+        <Modal title="Confirm record deletion" onClose={() => setDeleting(false)}>
+          <SecureAction
+            title="Permanently delete this record and its files"
+            onVerified={async () => {
+              try {
+                await vault.service.remove(record);
+                setDeleting(false);
+                onDeleted?.();
+              } catch (error) {
+                handleFailure(error);
+                if (error?.code !== '40001') throw error;
+              }
+            }}
+          />
+        </Modal>
+      )}
+    </Card>
+  );
+}

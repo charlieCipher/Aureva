@@ -1,13 +1,17 @@
-/* eslint-disable */
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import * as bip39 from "@scure/bip39";
 import { wordlist } from "@scure/bip39/wordlists/english.js";
 import { jsPDF } from "jspdf";
 
 export default function RecoveryPhrase({ onConfirmed }) {
-  const [phrase] = useState(() => bip39.generateMnemonic(wordlist, 128));
-  const [checked, setChecked] = useState(false);
+  const [phrase] = useState(() => bip39.generateMnemonic(wordlist, 256));
+  const challengeIndexes = useMemo(() => [4, 12, 18, 24], []);
+  const [answers, setAnswers] = useState({});
   const [copied, setCopied] = useState(false);
+  const words = phrase.split(" ");
+  const challengeComplete = challengeIndexes.every(
+    (index) => answers[index]?.trim().toLowerCase() === words[index - 1],
+  );
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(phrase);
@@ -21,7 +25,7 @@ export default function RecoveryPhrase({ onConfirmed }) {
     doc.text("Aureva Family Recovery Key", 20, 24);
     doc.setFont("helvetica", "normal");
     doc.setFontSize(11);
-    doc.text("Keep this 12-word phrase offline and private.", 20, 36);
+    doc.text("Keep this 24-word phrase offline and private.", 20, 36);
     doc.text("If you lose it, Aureva cannot recover your encrypted data.", 20, 44);
     doc.setFont("courier", "bold");
     doc.setFontSize(13);
@@ -35,10 +39,10 @@ export default function RecoveryPhrase({ onConfirmed }) {
     if (!printWindow) return;
     printWindow.document.write(`
       <html>
-        <head><title>Aureva Recovery Key</title></head>
+        <head><title>LEQVOR Recovery Key</title></head>
         <body style="font-family: Arial; padding: 40px;">
           <h1>Aureva Family Recovery Key</h1>
-          <p>Keep this 12-word phrase offline and private.</p>
+          <p>Keep this 24-word phrase offline and private.</p>
           <p><strong>If you lose it, Aureva cannot recover your encrypted data.</strong></p>
           <div style="font-family: monospace; font-size: 18px; line-height: 2; border: 1px solid #ccc; padding: 20px;">
             ${phrase}
@@ -92,7 +96,7 @@ export default function RecoveryPhrase({ onConfirmed }) {
           Save Your Family Recovery Key
         </h2>
         <p style={{ margin: "0 0 18px 0", color: "#6B7280", fontSize: 14, lineHeight: 1.65 }}>
-          This 12-word recovery phrase protects access to your encrypted continuity vault.
+          This 24-word recovery phrase protects access to your encrypted continuity vault.
           If you lose this recovery phrase, Aureva cannot recover your data.
         </p>
 
@@ -109,7 +113,11 @@ export default function RecoveryPhrase({ onConfirmed }) {
             color: "#111827",
           }}
         >
-          {phrase}
+          {words.map((word, index) => (
+            <span key={`${word}-${index}`} style={{ display: "inline-block", minWidth: 126 }}>
+              {index + 1}. {word}
+            </span>
+          ))}
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 10, marginTop: 14 }}>
@@ -160,30 +168,28 @@ export default function RecoveryPhrase({ onConfirmed }) {
           </button>
         </div>
 
-        <label
-          style={{
-            marginTop: 18,
-            display: "flex",
-            gap: 10,
-            alignItems: "flex-start",
-            color: "#5f6b59",
-            fontSize: 14,
-            lineHeight: 1.5,
-            cursor: "pointer",
-          }}
-        >
-          <input
-            type="checkbox"
-            checked={checked}
-            onChange={(e) => setChecked(e.target.checked)}
-            style={{ marginTop: 3 }}
-          />
-          I have safely saved my 12-word Family Recovery Key.
-        </label>
+        <div style={{ marginTop: 18 }}>
+          <p style={{ margin: "0 0 10px", color: "#5f6b59", fontSize: 14, lineHeight: 1.5 }}>
+            Verify that you saved it by entering these four words. This check happens only in your browser.
+          </p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 10 }}>
+            {challengeIndexes.map((index) => (
+              <input
+                key={index}
+                type="text"
+                autoComplete="off"
+                placeholder={`Word #${index}`}
+                value={answers[index] || ""}
+                onChange={(event) => setAnswers((current) => ({ ...current, [index]: event.target.value }))}
+                style={{ ...{ display: "block", width: "100%", padding: "12px 14px", background: "#FFFFFF", border: "1px solid #ECECF2", borderRadius: 12, color: "#111827", fontSize: 14, boxSizing: "border-box" }, borderColor: answers[index] && answers[index].trim().toLowerCase() !== words[index - 1] ? "#EF4444" : "#ECECF2" }}
+              />
+            ))}
+          </div>
+        </div>
 
         <button
           onClick={onConfirmed}
-          disabled={!checked}
+          disabled={!challengeComplete}
           style={{
             marginTop: 18,
             width: "100%",
@@ -194,8 +200,8 @@ export default function RecoveryPhrase({ onConfirmed }) {
             borderRadius: 999,
             fontSize: 15,
             fontWeight: 850,
-            opacity: checked ? 1 : 0.45,
-            cursor: checked ? "pointer" : "not-allowed",
+            opacity: challengeComplete ? 1 : 0.45,
+            cursor: challengeComplete ? "pointer" : "not-allowed",
           }}
         >
           Continue to Aureva

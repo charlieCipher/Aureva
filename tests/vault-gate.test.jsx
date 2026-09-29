@@ -1,0 +1,96 @@
+import {afterEach,it,expect,vi} from 'vitest';
+import { StrictMode } from 'react';
+import {act,cleanup,render,screen,fireEvent,waitFor} from '@testing-library/react';
+import { VaultSession } from '../src/modules/security/VaultSession';
+const mocks=vi.hoisted(()=>({db:{vault:vi.fn(),createVault:vi.fn(),updateVault:vi.fn()},auth:{signOut:vi.fn()},create:vi.fn(),unlock:vi.fn(),phrase:Array(24).fill('word').join(' ')}));
+vi.mock('../src/lib/providers',()=>({DatabaseProvider:mocks.db,AuthProvider:mocks.auth,ObjectStorageProvider:{}}));
+vi.mock('../src/modules/security/v5Crypto',()=>({createVaultEnvelope:mocks.create,generateRecoverySecret:()=>mocks.phrase,unlockVault:mocks.unlock,rewrapVaultPassword:vi.fn()}));
+import VaultGate from '../src/features/vault/VaultGate';
+afterEach(()=>{cleanup();vi.restoreAllMocks();vi.resetAllMocks();});
+it('discards an unlock completed after unmount under StrictMode',async()=>{
+ mocks.db.vault.mockResolvedValue({id:'vault',owner_id:'owner'});
+ let finish;
+ mocks.unlock.mockImplementation(()=>new Promise(resolve=>{finish=resolve;}));
+ const activate=vi.spyOn(VaultSession.prototype,'unlock');
+ const view=render(<StrictMode><VaultGate session={{user:{id:'owner'}}}><div>Unlocked workspace</div></VaultGate></StrictMode>);
+ const button=await screen.findByRole('button',{name:'Unlock vault',exact:true});
+ fireEvent.change(screen.getByLabelText('Vault password'),{target:{value:'synthetic test password'}});
+ fireEvent.click(button);
+ await waitFor(()=>expect(mocks.unlock).toHaveBeenCalledTimes(1));
+ view.unmount();
+ await act(async()=>finish({}));
+ expect(activate).not.toHaveBeenCalled();
+ expect(screen.queryByText('Unlocked workspace')).toBeNull();
+});
+it('requires recovery confirmation before creating the vault and locks on blur',async()=>{
+ mocks.db.vault.mockResolvedValue(null);
+ mocks.create.mockResolvedValue({id:'vault',owner_id:'owner'});
+ mocks.db.createVault.mockImplementation(async row=>row);
+ mocks.unlock.mockResolvedValue({});
+ render(<VaultGate session={{user:{id:'owner'}}}><div>Unlocked workspace</div></VaultGate>);
+ fireEvent.click(await screen.findByRole('button',{name:'Generate recovery secret'}));
+ fireEvent.change(screen.getByLabelText('Vault password'),{target:{value:'long test password'}});
+ fireEvent.change(screen.getByLabelText('Confirm vault password'),{target:{value:'long test password'}});
+ fireEvent.change(screen.getByLabelText('Verify all 24 words'),{target:{value:'incorrect'}});
+ fireEvent.click(screen.getByRole('button',{name:'Verify recovery & create vault'}));
+ await screen.findByText('Recovery verification failed.');
+ expect(mocks.db.createVault).not.toHaveBeenCalled();
+ fireEvent.change(screen.getByLabelText('Vault password'),{target:{value:'long test password'}});
+ fireEvent.change(screen.getByLabelText('Confirm vault password'),{target:{value:'long test password'}});
+ fireEvent.change(screen.getByLabelText('Verify all 24 words'),{target:{value:mocks.phrase}});
+ fireEvent.click(screen.getByRole('button',{name:'Verify recovery & create vault'}));
+ await screen.findByText('Unlocked workspace');
+ expect(mocks.db.createVault).toHaveBeenCalledWith(expect.objectContaining({recovery_verified_at:expect.any(String)}));
+ fireEvent.blur(window);
+ await screen.findByRole('button',{name:'Unlock vault',exact:true});
+ expect(screen.queryByText('Unlocked workspace')).toBeNull();
+});
+it('does not offer vault creation after a database lookup failure',async()=>{
+ mocks.db.vault.mockRejectedValue(new Error('offline'));
+ render(<VaultGate session={{user:{id:'owner'}}}><div>Unlocked workspace</div></VaultGate>);
+ await screen.findByRole('alert');
+ expect(screen.queryByRole('button',{name:'Generate recovery secret'})).toBeNull();
+ expect(mocks.db.createVault).not.toHaveBeenCalled();
+});
+it('rejects a vault returned for another account',async()=>{
+ mocks.db.vault.mockResolvedValue({id:'foreign',owner_id:'other'});
+ render(<VaultGate session={{user:{id:'owner'}}}><div>Unlocked workspace</div></VaultGate>);
+ await waitFor(()=>expect(screen.getByRole('alert')).toBeTruthy());
+ expect(screen.queryByRole('button',{name:'Unlock vault',exact:true})).toBeNull();
+});
+
+it('cancels an unlock interrupted by focus loss and permits a fresh retry',async()=>{
+ mocks.db.vault.mockResolvedValue({id:'vault',owner_id:'owner'});
+ let finish;
+ mocks.unlock.mockImplementationOnce(()=>new Promise(resolve=>{finish=resolve;})).mockResolvedValue({});
+ render(<VaultGate session={{user:{id:'owner'}}}><div>Unlocked workspace</div></VaultGate>);
+ const unlock=await screen.findByRole('button',{name:'Unlock vault',exact:true});
+ fireEvent.change(screen.getByLabelText('Vault password'),{target:{value:'synthetic password'}});
+ fireEvent.click(unlock);
+ await waitFor(()=>expect(mocks.unlock).toHaveBeenCalledTimes(1));
+ expect(screen.getByRole('button',{name:'Recover using 24 words'}).disabled).toBe(true);
+ fireEvent.blur(window);
+ finish({});
+ await screen.findByText(/Unlock was cancelled/);
+ expect(screen.queryByText('Unlocked workspace')).toBeNull();
+ expect(screen.getByLabelText('Vault password').value).toBe('');
+ expect(screen.queryByRole('alert')).toBeNull();
+ fireEvent.change(screen.getByLabelText('Vault password'),{target:{value:'synthetic password'}});
+ fireEvent.click(screen.getByRole('button',{name:'Unlock vault',exact:true}));
+ await screen.findByText('Unlocked workspace');
+ fireEvent.blur(window);
+ await screen.findByText(/this window lost focus/);
+ expect(screen.queryByText('Unlocked workspace')).toBeNull();
+});
+
+it('clears a failed unlock secret without exposing the underlying error',async()=>{
+ mocks.db.vault.mockResolvedValue({id:'vault',owner_id:'owner'});
+ mocks.unlock.mockRejectedValue(new Error('PRIVATE_SECRET_CANARY'));
+ render(<VaultGate session={{user:{id:'owner'}}}><div>Unlocked workspace</div></VaultGate>);
+ await screen.findByRole('button',{name:'Unlock vault',exact:true});
+ fireEvent.change(screen.getByLabelText('Vault password'),{target:{value:'synthetic password'}});
+ fireEvent.click(screen.getByRole('button',{name:'Unlock vault',exact:true}));
+ await screen.findByRole('alert');
+ expect(screen.getByLabelText('Vault password').value).toBe('');
+ expect(screen.queryByText(/PRIVATE_SECRET_CANARY/)).toBeNull();
+});

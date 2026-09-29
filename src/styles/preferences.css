@@ -1,0 +1,16 @@
+.leqvor .modal fieldset { border: 1px solid #384151; border-radius: 8px; padding: 12px; min-width: 0; }
+.leqvor .modal legend { padding: 0 8px; color: var(--text-primary); }
+.leqvor .modal .preference-check { display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 8px; cursor: pointer; }
+.leqvor .modal .preference-check input { width: 18px; height: 18px; flex: 0 0 18px; accent-color: var(--brand-hover); }
+.leqvor .modal .preference-check span { min-width: 0; overflow-wrap: anywhere; }
+.leqvor .modal small { display: block; color: var(--text-secondary); }
+.leqvor .record-choice-list { max-height: 260px; overflow-y: auto; }
+.leqvor .security-event-list { display: grid; gap: 16px; padding-left: 24px; }
+.leqvor .modal details { border-top: 1px solid #384151; padding: 12px 0; }
+.leqvor .modal summary { cursor: pointer; min-height: 44px; align-content: center; }
+.leqvor .modal .setting-row { gap: 16px; }
+.leqvor .modal .setting-row > span { min-width: 0; overflow-wrap: anywhere; }
+@media (max-width: 600px) {
+  .leqvor .modal .setting-row { flex-wrap: wrap; }
+  .leqvor .modal button { min-height: 44px; }
+}

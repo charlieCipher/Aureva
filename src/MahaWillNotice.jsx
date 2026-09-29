@@ -1,4 +1,3 @@
-/* eslint-disable */
 function MahaWillNotice() {
   return (
     <div

@@ -1,0 +1,30 @@
+import { afterEach, expect, it, vi } from 'vitest';
+import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import Vault, { RecordPage } from '../src/app/Vault';
+afterEach(cleanup);
+it('moves tab focus with arrows and Home/End without activating private sections', () => {
+  render(<RecordPage record={{id:'sample',title:'Sample record',category:'Property',demo:true}} go={vi.fn()} />);
+  const overview=screen.getByRole('tab',{name:'Overview'}), documents=screen.getByRole('tab',{name:'Documents'}), history=screen.getByRole('tab',{name:'History'});
+  overview.focus(); fireEvent.keyDown(overview,{key:'ArrowRight'});
+  expect(document.activeElement).toBe(documents);
+  expect(overview.getAttribute('aria-selected')).toBe('true');
+  fireEvent.keyDown(documents,{key:'End'}); expect(document.activeElement).toBe(history);
+  fireEvent.keyDown(history,{key:'ArrowRight'}); expect(document.activeElement).toBe(overview);
+  fireEvent.keyDown(overview,{key:'ArrowLeft'}); expect(document.activeElement).toBe(history);
+  fireEvent.keyDown(history,{key:'Home'}); expect(document.activeElement).toBe(overview);
+  fireEvent.click(screen.getByRole('button',{name:'Reveal securely'}));
+  fireEvent.click(documents);
+  expect(documents.getAttribute('aria-selected')).toBe('true');
+  expect(screen.getByRole('tabpanel',{name:'Documents'}).id).toBe(documents.getAttribute('aria-controls'));
+  fireEvent.click(overview);
+  expect(screen.getByText('Sensitive information hidden')).toBeTruthy();
+  expect(screen.queryByRole('button',{name:'Hide information'})).toBeNull();
+});
+it('exposes asset categories as pressed filter buttons', () => {
+  render(<Vault records={[]} search="" setSearch={vi.fn()} go={vi.fn()} />);
+  expect(screen.getByRole('group',{name:'Asset category'})).toBeTruthy();
+  const property=screen.getByRole('button',{name:'Property',exact:true});
+  fireEvent.click(property);
+  expect(property.getAttribute('aria-pressed')).toBe('true');
+  expect(screen.getByRole('button',{name:'All',exact:true}).getAttribute('aria-pressed')).toBe('false');
+});
